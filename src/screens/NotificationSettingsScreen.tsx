@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Switch, TouchableOpacity, Platform, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { styles } from './styles/NotificationSettingsScreen.styles';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import { quotes } from '../data/quotes';
 
 const NotificationSettingsScreen: React.FC = () => {
   const [dailyReminder, setDailyReminder] = useState(true);
@@ -10,12 +12,53 @@ const NotificationSettingsScreen: React.FC = () => {
   const [preferredTime, setPreferredTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, []);
+
+  const requestNotificationPermissions = () => {
+    if (Platform.OS === 'ios') {
+      PushNotificationIOS.requestPermissions().then(
+        (permissions) => {
+          console.log('Permissions:', permissions);
+        },
+      );
+    }
+  };
+
+  const scheduleDailyNotification = (time: Date) => {
+    PushNotificationIOS.cancelAllLocalNotifications();
+
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+    PushNotificationIOS.scheduleLocalNotification({
+      alertBody: randomQuote.text,
+      alertTitle: 'Daily Boost',
+      fireDate: time.toISOString(),
+      repeats: 'day',
+      userInfo: { id: 'daily_boost_quote', category: randomQuote.category },
+      soundName: soundEnabled ? 'default' : undefined,
+    });
+    Alert.alert('Notification Set', `Daily reminder set for ${time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+  };
+
   const onTimeChange = (event: any, selectedDate?: Date) => {
     const currentTime = selectedDate || preferredTime;
     setShowTimePicker(Platform.OS === 'ios');
     setPreferredTime(currentTime);
-    // In a real app, you would schedule the notification here
-    Alert.alert('Notification Time Set', `Daily reminder set for ${currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+    if (dailyReminder) {
+      scheduleDailyNotification(currentTime);
+    }
+  };
+
+  const handleDailyReminderToggle = (value: boolean) => {
+    setDailyReminder(value);
+    if (!value) {
+      PushNotificationIOS.cancelAllLocalNotifications();
+      Alert.alert('Reminders Off', 'Daily reminders have been turned off.');
+    } else {
+      scheduleDailyNotification(preferredTime);
+    }
   };
 
   return (
@@ -25,7 +68,7 @@ const NotificationSettingsScreen: React.FC = () => {
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Daily Reminder</Text>
         <Switch
-          onValueChange={setDailyReminder}
+          onValueChange={handleDailyReminderToggle}
           value={dailyReminder}
           trackColor={{ false: '#767577', true: '#81b0ff' }}
           thumbColor={dailyReminder ? '#5DADE2' : '#f4f3f4'}
