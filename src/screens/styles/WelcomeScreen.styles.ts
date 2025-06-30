@@ -24,6 +24,12 @@ export const styles = StyleSheet.create({
     color: '#828282',
     textAlign: 'center',
   },
+  tapText: {
+    fontSize: 16,
+    color: '#333333',
+    marginTop: 20,
+    textAlign: 'center',
+  },
 });
 
 

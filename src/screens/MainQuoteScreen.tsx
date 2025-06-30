@@ -1,26 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, Alert } from 'react-native';
-import { quotes, categoryData } from '../data/quotes';
+import { quotes, getBackgroundImage } from '../data/quotes';
 import { styles } from './styles/MainQuoteScreen.styles';
 import Sound from 'react-native-sound';
 
 Sound.setCategory('Playback');
 
+// Định nghĩa trực tiếp các đường dẫn âm thanh
+const SOUND_PATHS = {
+  'Happiness': 'happiness_sound.mp3',
+  'Productivity': 'productivity_sound.mp3',
+  'Self-Love': 'happiness_sound.mp3',
+  'Inspiration': 'happiness_sound.mp3',
+  'Success': 'happiness_sound.mp3',
+  'Mindfulness': 'happiness_sound.mp3',
+};
+
 const MainQuoteScreen: React.FC = () => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [currentSound, setCurrentSound] = useState<Sound | null>(null);
+  const [backgroundSource, setBackgroundSource] = useState<any>(null);
 
   const currentQuote = quotes[currentQuoteIndex];
-  const currentCategory = categoryData[currentQuote.category];
-
+  
+  // Sử dụng useEffect để tải hình ảnh nền
   useEffect(() => {
+    try {
+      const bgImage = getBackgroundImage(currentQuote.category);
+      setBackgroundSource(bgImage);
+    } catch (error) {
+      console.error('Error setting background image:', error);
+      setBackgroundSource(require('../../assets/main_quote_background.png'));
+    }
+  }, [currentQuote.category]);
+  
+  useEffect(() => {
+    // Cleanup previous sound
     if (currentSound) {
       currentSound.release();
     }
 
-    if (currentCategory.sound) {
-      const sound = new Sound(currentCategory.sound, Sound.MAIN_BUNDLE, (error) => {
+    try {
+      // Xác định đường dẫn âm thanh dựa trên danh mục
+      const category = currentQuote.category as keyof typeof SOUND_PATHS;
+      const soundFileName = SOUND_PATHS[category] || 'happiness_sound.mp3';
+
+      // Load new sound sử dụng đường dẫn trực tiếp
+      const sound = new Sound(soundFileName, Sound.MAIN_BUNDLE, (error) => {
         if (error) {
           console.log('failed to load the sound', error);
           Alert.alert('Error', 'Failed to load sound for this category.');
@@ -39,16 +66,17 @@ const MainQuoteScreen: React.FC = () => {
         }
         setCurrentSound(sound);
       });
-    } else {
-      setCurrentSound(null);
-    }
 
-    return () => {
-      if (currentSound) {
-        currentSound.release();
-      }
-    };
-  }, [currentQuoteIndex, isMuted]);
+      return () => {
+        if (sound) {
+          sound.release();
+        }
+      };
+    } catch (error) {
+      console.error('Error loading sound:', error);
+      return () => {};
+    }
+  }, [currentQuoteIndex, isMuted, currentQuote.category, currentSound]);
 
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
@@ -81,9 +109,18 @@ const MainQuoteScreen: React.FC = () => {
     setIsMuted(!isMuted);
   };
 
+  // Nếu backgroundSource chưa sẵn sàng, hiển thị một màn hình trống
+  if (!backgroundSource) {
+    return (
+      <View style={styles.background}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <ImageBackground 
-      source={currentCategory.backgroundImage} 
+      source={backgroundSource}
       style={styles.background}
     >
       <View style={styles.overlay}>
