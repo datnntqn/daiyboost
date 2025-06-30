@@ -16,13 +16,45 @@ export const quotes = [
   { id: '15', text: 'Smile big, Laugh often. Never take this life for granted.', category: 'Happiness' },
 ];
 
-export const categories = [
-  { id: '1', name: 'Happiness' },
-  { id: '2', name: 'Productivity' },
-  { id: '3', name: 'Self-Love' },
-  { id: '4', name: 'Inspiration' },
-  { id: '5', name: 'Success' },
-  { id: '6', name: 'Mindfulness' },
-];
+export const categoryData = {
+  'Happiness': { 
+    id: '1', 
+    name: 'Happiness', 
+    backgroundImage: require('../../assets/backgrounds/happiness_bg.png'),
+    sound: require('../../assets/sounds/happiness_sound.mp3')
+  },
+  'Productivity': { 
+    id: '2', 
+    name: 'Productivity', 
+    backgroundImage: require('../../assets/backgrounds/productivity_bg.png'),
+    sound: require('../../assets/sounds/productivity_sound.mp3')
+  },
+  'Self-Love': { 
+    id: '3', 
+    name: 'Self-Love', 
+    backgroundImage: require('../../assets/backgrounds/self_love_bg.png'),
+    sound: require('../../assets/sounds/self_love_sound.mp3')
+  },
+  'Inspiration': { 
+    id: '4', 
+    name: 'Inspiration', 
+    backgroundImage: require('../../assets/backgrounds/inspiration_bg.png'),
+    sound: require('../../assets/sounds/inspiration_sound.mp3')
+  },
+  'Success': { 
+    id: '5', 
+    name: 'Success', 
+    backgroundImage: require('../../assets/backgrounds/success_bg.png'),
+    sound: require('../../assets/sounds/success_sound.mp3')
+  },
+  'Mindfulness': { 
+    id: '6', 
+    name: 'Mindfulness', 
+    backgroundImage: require('../../assets/backgrounds/mindfulness_bg.png'),
+    sound: require('../../assets/sounds/mindfulness_sound.mp3')
+  },
+};
+
+export const categories = Object.values(categoryData);
 
 

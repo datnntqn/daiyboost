@@ -43,6 +43,12 @@ export const styles = StyleSheet.create({
     left: 10,
     padding: 10,
   },
+  soundButton: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    padding: 10,
+  },
   iconText: {
     fontSize: 16,
     color: '#333333',
