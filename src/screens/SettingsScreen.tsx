@@ -1,49 +1,100 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import { styles } from './styles/SettingsScreen.styles';
+import { RootStackParamList } from '../types/navigation';
 
-const SettingsScreen: React.FC = ({ navigation }) => {
+type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
+
+type SettingsScreenProps = {
+  navigation: SettingsScreenNavigationProp;
+};
+
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <View style={[styles.container, { backgroundColor: theme === 'light' ? '#E9FDF2' : '#181818' }]}>
-      <Text style={[styles.title, { color: theme === 'light' ? '#333333' : '#FFFFFF' }]}>Settings</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Settings</Text>
+      </View>
 
-      <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Category')}>
-        <Text style={styles.settingText}>Categories</Text>
+      <TouchableOpacity 
+        style={styles.settingItem} 
+        onPress={() => navigation.navigate('Category')}
+      >
+        <View style={styles.settingContent}>
+          <Text style={styles.settingIcon}>🔲</Text>
+          <Text style={styles.settingText}>Categories</Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('NotificationSettings')}>
-        <Text style={styles.settingText}>Notifications</Text>
+      <TouchableOpacity 
+        style={styles.settingItem} 
+        onPress={() => navigation.navigate('NotificationSettings')}
+      >
+        <View style={styles.settingContent}>
+          <Text style={styles.settingIcon}>🔔</Text>
+          <Text style={styles.settingText}>Notifications</Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
 
       <View style={styles.settingItem}>
-        <Text style={styles.settingText}>Theme</Text>
+        <View style={styles.settingContent}>
+          <Text style={styles.settingIcon}>☀️</Text>
+          <Text style={styles.settingText}>Theme</Text>
+        </View>
         <View style={styles.themeToggleContainer}>
           <TouchableOpacity
             style={[styles.themeOption, theme === 'light' && styles.themeOptionSelected]}
-            onPress={() => toggleTheme()}
+            onPress={() => theme !== 'light' && toggleTheme()}
           >
-            <Text style={[styles.themeOptionText, theme === 'light' && styles.themeOptionTextSelected]}>Light</Text>
+            <Text style={[styles.themeOptionText, theme === 'light' && styles.themeOptionTextSelected]}>
+              Light
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.themeOption, theme === 'dark' && styles.themeOptionSelected]}
-            onPress={() => toggleTheme()}
+            onPress={() => theme !== 'dark' && toggleTheme()}
           >
-            <Text style={[styles.themeOptionText, theme === 'dark' && styles.themeOptionTextSelected]}>Dark</Text>
+            <Text style={[styles.themeOptionText, theme === 'dark' && styles.themeOptionTextSelected]}>
+              Dark
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <Text style={[styles.sectionTitle, { color: theme === 'light' ? '#828282' : '#F2F2F2' }]}>Premium Features</Text>
+      <Text style={styles.sectionTitle}>Premium Features</Text>
 
-      <TouchableOpacity style={styles.settingItem} onPress={() => console.log('Go Ad-Free pressed')}>
-        <Text style={styles.settingText}>Go Ad-Free</Text>
+      <TouchableOpacity 
+        style={styles.settingItem} 
+        onPress={() => console.log('Go Ad-Free pressed')}
+      >
+        <View style={styles.settingContent}>
+          <Text style={styles.settingIcon}>⭐</Text>
+          <Text style={styles.settingText}>Go Ad-Free</Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.settingItem} onPress={() => console.log('Unlock All Features pressed')}>
-        <Text style={styles.settingText}>Unlock All Features</Text>
+      <TouchableOpacity 
+        style={styles.settingItem} 
+        onPress={() => console.log('Unlock All Features pressed')}
+      >
+        <View style={styles.settingContent}>
+          <Text style={styles.settingIcon}>🔓</Text>
+          <Text style={styles.settingText}>Unlock All Features</Text>
+        </View>
+        <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
 
       {/* Ad Space Placeholder */}

@@ -63,21 +63,24 @@ const NotificationSettingsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Notification Settings</Text>
+      <Text style={styles.title}>Notification{'\n'}Settings</Text>
 
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Daily Reminder</Text>
         <Switch
+          style={styles.switch}
           onValueChange={handleDailyReminderToggle}
           value={dailyReminder}
-          trackColor={{ false: '#767577', true: '#81b0ff' }}
-          thumbColor={dailyReminder ? '#5DADE2' : '#f4f3f4'}
+          trackColor={{ false: '#E0E0E0', true: '#A8C8EC' }}
+          thumbColor={dailyReminder ? '#5DADE2' : '#FFFFFF'}
         />
       </View>
 
       <TouchableOpacity style={styles.settingItem} onPress={() => setShowTimePicker(true)}>
         <Text style={styles.settingText}>Preferred Time</Text>
-        <Text style={styles.settingValue}>{preferredTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+        <Text style={styles.settingValue}>
+          {preferredTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </Text>
       </TouchableOpacity>
 
       {showTimePicker && (
@@ -94,26 +97,28 @@ const NotificationSettingsScreen: React.FC = () => {
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Sound</Text>
         <Switch
+          style={styles.switch}
           onValueChange={setSoundEnabled}
           value={soundEnabled}
-          trackColor={{ false: '#767577', true: '#81b0ff' }}
-          thumbColor={soundEnabled ? '#5DADE2' : '#f4f3f4'}
+          trackColor={{ false: '#E0E0E0', true: '#A8C8EC' }}
+          thumbColor={soundEnabled ? '#5DADE2' : '#FFFFFF'}
         />
       </View>
 
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Vibration</Text>
         <Switch
+          style={styles.switch}
           onValueChange={setVibrationEnabled}
           value={vibrationEnabled}
-          trackColor={{ false: '#767577', true: '#81b0ff' }}
-          thumbColor={vibrationEnabled ? '#5DADE2' : '#f4f3f4'}
+          trackColor={{ false: '#E0E0E0', true: '#A8C8EC' }}
+          thumbColor={vibrationEnabled ? '#5DADE2' : '#FFFFFF'}
         />
       </View>
 
       {/* Ad Space Placeholder */}
       <View style={styles.adSpace}>
-        <Text style={styles.adText}>Ad Banner</Text>
+        <Text style={styles.adText}>Ad</Text>
       </View>
     </View>
   );

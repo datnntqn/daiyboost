@@ -11,6 +11,15 @@ type CategoryScreenProps = {
   navigation: CategoryScreenNavigationProp;
 };
 
+const categoryIcons: Record<string, string> = {
+  'Happiness': '😊',
+  'Productivity': '✅',
+  'Self-Love': '💙',
+  'Inspiration': '💡',
+  'Success': '⭐',
+  'Mindfulness': '🧘',
+};
+
 const CategoryScreen: React.FC<CategoryScreenProps> = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
 
@@ -23,27 +32,30 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ navigation }) => {
       style={styles.categoryItem}
       onPress={() => navigation.navigate('QuoteList', { category: item.name })}
     >
+      <Text style={styles.categoryIcon}>
+        {categoryIcons[item.name] || '📝'}
+      </Text>
       <Text style={styles.categoryText}>{item.name}</Text>
-      <Text style={styles.chevron}>›</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.appTitle}>Daily Boost</Text>
-          <Text style={styles.title}>Categories</Text>
-        </View>
+        <Text style={styles.appTitle}>Daily Boost</Text>
+        <Text style={styles.title}>Categories</Text>
       </View>
       
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search categories"
-        placeholderTextColor="#BDC3C7"
-        value={searchText}
-        onChangeText={setSearchText}
-      />
+      <View style={styles.searchContainer}>
+        <Text style={styles.searchIcon}>🔍</Text>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search categories"
+          placeholderTextColor="#BDC3C7"
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+      </View>
       
       <FlatList
         data={filteredCategories}

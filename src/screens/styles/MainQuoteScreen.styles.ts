@@ -1,78 +1,136 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  background: {
+  container: {
+    flex: 1,
+    backgroundColor: '#E8F4FD',
+  },
+  gradientBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  quoteCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 30,
+    marginHorizontal: 20,
+    marginVertical: 40,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+    minHeight: 400,
+    justifyContent: 'space-between',
+  },
+  header: {
+    alignItems: 'flex-end',
+    marginBottom: 20,
+  },
+  shareIcon: {
+    fontSize: 20,
+    color: '#5DADE2',
+  },
+  quoteContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  overlay: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    position: 'relative',
-  },
-  topButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    position: 'absolute',
-    top: -50,
-    paddingHorizontal: 20,
-  },
-  categoryButton: {
-    backgroundColor: 'rgba(93, 173, 226, 0.8)',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
-  settingsButton: {
-    backgroundColor: 'rgba(93, 173, 226, 0.8)',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
   quoteText: {
-    fontSize: 28,
-    color: '#333333',
+    fontSize: 24,
+    color: '#2C5282',
     textAlign: 'center',
-    marginBottom: 30,
-    fontFamily: 'serif', // Placeholder, will refine with actual font
+    lineHeight: 32,
+    fontWeight: '500',
+    marginBottom: 40,
+  },
+  footer: {
+    alignItems: 'center',
   },
   nextButton: {
-    backgroundColor: '#5DADE2',
-    paddingVertical: 12,
-    paddingHorizontal: 40,
+    backgroundColor: '#4A90E2',
+    paddingVertical: 15,
+    paddingHorizontal: 60,
     borderRadius: 25,
+    marginBottom: 20,
   },
   nextButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: 'bold',
-  },
-  shareButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 10,
+    fontWeight: '600',
   },
   favoriteButton: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
     padding: 10,
   },
-  soundButton: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    padding: 10,
+  favoriteIcon: {
+    fontSize: 24,
+    color: '#BDC3C7',
   },
-  iconText: {
-    fontSize: 16,
-    color: '#333333',
+  favoriteIconActive: {
+    color: '#E74C3C',
+  },
+  navigationButtons: {
+    position: 'absolute',
+    bottom: 30,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  navButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  navButtonText: {
+    color: '#2C5282',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  muteButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 10,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  muteButtonText: {
+    color: '#2C5282',
+    fontSize: 12,
+  },
+  adBanner: {
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    padding: 10,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  adText: {
+    fontSize: 14,
+    color: '#7F8C8D',
   },
 });
-
 

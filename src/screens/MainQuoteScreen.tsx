@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { quotes, getBackgroundImage, CategoryKey } from '../data/quotes';
+import { quotes, CategoryKey } from '../data/quotes';
 import { styles } from './styles/MainQuoteScreen.styles';
 import { RootStackParamList } from '../types/navigation';
 import Sound from 'react-native-sound';
@@ -28,21 +29,10 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = ({ navigation }) => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [currentSound, setCurrentSound] = useState<Sound | null>(null);
-  const [backgroundSource, setBackgroundSource] = useState<any>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const currentQuote = quotes[currentQuoteIndex];
-  
-  // Sử dụng useEffect để tải hình ảnh nền
-  useEffect(() => {
-    try {
-      const bgImage = getBackgroundImage(currentQuote.category);
-      setBackgroundSource(bgImage);
-    } catch (error) {
-      console.error('Error setting background image:', error);
-      setBackgroundSource(require('../../assets/main_quote_background.png'));
-    }
-  }, [currentQuote.category]);
-  
+
   useEffect(() => {
     // Cleanup previous sound
     if (currentSound) {
@@ -98,83 +88,98 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = ({ navigation }) => {
       Alert.alert('Error', 'An unexpected error occurred while loading audio.');
       return () => {};
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuoteIndex, isMuted, currentQuote.category]);
 
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
-  };
-
-  const handleShare = () => {
-    console.log('Share current quote:', currentQuote.text);
-    // Implement actual sharing logic here
-  };
-
-  const handleFavorite = () => {
-    console.log('Add to favorites:', currentQuote.text);
-    // Implement actual favorite logic here
+    setIsFavorite(false); // Reset favorite for new quote
   };
 
   const toggleMute = () => {
+    setIsMuted(!isMuted);
     if (currentSound) {
       if (isMuted) {
-        currentSound.play((success) => {
-          if (success) {
-            console.log('successfully finished playing');
-          } else {
-            console.log('playback failed due to audio decoding errors');
-          }
-        });
+        currentSound.play();
       } else {
-        currentSound.pause();
+        currentSound.stop();
       }
     }
-    setIsMuted(!isMuted);
   };
 
-  // Nếu backgroundSource chưa sẵn sàng, hiển thị một màn hình trống
-  if (!backgroundSource) {
-    return (
-      <View style={styles.background}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  const toggleFavorite = () => {
+    setIsFavorite(!isFavorite);
+  };
+
+  const handleShare = () => {
+    // Share functionality would go here
+    Alert.alert('Share', 'Share functionality would be implemented here');
+  };
 
   return (
-    <ImageBackground 
-      source={backgroundSource}
-      style={styles.background}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.topButtons}>
-          <TouchableOpacity onPress={() => navigation.navigate('Category')} style={styles.categoryButton}>
-            <Text style={styles.iconText}>Categories</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsButton}>
-            <Text style={styles.iconText}>Settings</Text>
-          </TouchableOpacity>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#E8F4FD', '#FFE5D9']}
+        style={styles.gradientBackground}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+      >
+        {/* Mute Button */}
+        <TouchableOpacity style={styles.muteButton} onPress={toggleMute}>
+          <Text style={styles.muteButtonText}>{isMuted ? '🔇' : '🔊'}</Text>
+        </TouchableOpacity>
+
+        {/* Quote Card */}
+        <View style={styles.quoteCard}>
+          {/* Header with Share Icon */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleShare}>
+              <Text style={styles.shareIcon}>📤</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Quote Content */}
+          <View style={styles.quoteContent}>
+            <Text style={styles.quoteText}>{currentQuote.text}</Text>
+          </View>
+
+          {/* Footer with Next Button and Favorite */}
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
+              <Text style={styles.nextButtonText}>Next</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.favoriteButton} onPress={toggleFavorite}>
+              <Text style={[styles.favoriteIcon, isFavorite && styles.favoriteIconActive]}>
+                {isFavorite ? '❤️' : '🤍'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
-          {/* Placeholder for Share Icon */}
-          <Text style={styles.iconText}>Share</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity onPress={toggleMute} style={styles.soundButton}>
-          <Text style={styles.iconText}>{isMuted ? 'Unmute' : 'Mute'}</Text>
-        </TouchableOpacity>
+        {/* Ad Banner */}
+        <View style={styles.adBanner}>
+          <Text style={styles.adText}>Ad</Text>
+        </View>
 
-        <Text style={styles.quoteText}>{currentQuote.text}</Text>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleFavorite} style={styles.favoriteButton}>
-          {/* Placeholder for Favorite Icon */}
-          <Text style={styles.iconText}>Favorite</Text>
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
+        {/* Navigation Buttons */}
+        <View style={styles.navigationButtons}>
+          <TouchableOpacity 
+            style={styles.navButton}
+            onPress={() => navigation.navigate('Category')}
+          >
+            <Text style={styles.navButtonText}>Categories</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.navButton}
+            onPress={() => navigation.navigate('Settings')}
+          >
+            <Text style={styles.navButtonText}>Settings</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+    </View>
   );
 };
 
