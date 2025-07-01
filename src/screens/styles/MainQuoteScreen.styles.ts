@@ -13,6 +13,26 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
+  topButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    position: 'absolute',
+    top: -50,
+    paddingHorizontal: 20,
+  },
+  categoryButton: {
+    backgroundColor: 'rgba(93, 173, 226, 0.8)',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
+  settingsButton: {
+    backgroundColor: 'rgba(93, 173, 226, 0.8)',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
   quoteText: {
     fontSize: 28,
     color: '#333333',

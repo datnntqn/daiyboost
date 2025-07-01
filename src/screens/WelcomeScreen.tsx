@@ -1,28 +1,33 @@
 import React from 'react';
-import { View, Text, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from './styles/WelcomeScreen.styles';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
+
+type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
 type WelcomeScreenProps = {
-  navigation: NativeStackNavigationProp<any>;
+  navigation: WelcomeScreenNavigationProp;
 };
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   return (
     <TouchableOpacity 
-      style={{ flex: 1 }}
+      style={styles.container}
       onPress={() => navigation.navigate('MainQuote')}
     >
-      <ImageBackground 
-        source={require("../../assets/welcome_background.png")} 
-        style={styles.background}
-      >
+      <View style={styles.background}>
         <View style={styles.overlay}>
-          <Text style={styles.title}>Welcome to Daily Boost!</Text>
-          <Text style={styles.subtitle}>Your daily dose of inspiration starts here.</Text>
+          <Text style={styles.title}>Welcome to{'\n'}Daily Boost!</Text>
+          <Text style={styles.subtitle}>Your daily dose of{'\n'}inspiration starts here.</Text>
+          
+          <View style={styles.sunContainer}>
+            <Text style={styles.sunEmoji}>☀️</Text>
+          </View>
+          
           <Text style={styles.tapText}>Tap anywhere to continue</Text>
         </View>
-      </ImageBackground>
+      </View>
     </TouchableOpacity>
   );
 };
