@@ -35,7 +35,7 @@ const NotificationSettingsScreen: React.FC = () => {
       alertBody: randomQuote.text,
       alertTitle: 'Daily Boost',
       fireDate: time.toISOString(),
-      repeats: 'day',
+      repeatInterval: 'day',
       userInfo: { id: 'daily_boost_quote', category: randomQuote.category },
       soundName: soundEnabled ? 'default' : undefined,
     });
