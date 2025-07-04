@@ -41,10 +41,6 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.appTitle}>Daily Boost</Text>
-        <Text style={styles.title}>Categories</Text>
-      </View>
       
       <View style={styles.searchContainer}>
         <Text style={styles.searchIcon}>🔍</Text>

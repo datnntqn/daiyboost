@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, LogBox } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, SafeAreaView, LogBox, Modal, Pressable } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { quotes } from '../data/quotes';
 import { styles } from './styles/MainQuoteScreen.styles';
+import { useNavigation } from '@react-navigation/native';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -12,6 +13,8 @@ type MainQuoteScreenProps = {};
 const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const navigation = useNavigation();
 
   // Đảm bảo có dữ liệu hợp lệ với useMemo
   const safeQuote = useMemo(() => {
@@ -22,11 +25,6 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     };
   }, [currentQuoteIndex]);
   
-  // Log để debug
-  useEffect(() => {
-    console.log("Current quote:", safeQuote);
-    console.log("Total quotes:", quotes.length);
-  }, [safeQuote]);
 
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
@@ -40,6 +38,16 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const handleShare = () => {
     // Share functionality would go here
     Alert.alert('Share', 'Share functionality would be implemented here');
+  };
+
+  // Handler cho menu
+  const handleMenuSelect = (type: 'categories' | 'settings') => {
+    setMenuVisible(false);
+    if (type === 'categories') {
+      navigation.navigate('Category' as never);
+    } else {
+      navigation.navigate('Settings' as never);
+    }
   };
 
   return (
@@ -80,17 +88,6 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
           {/* Next Button */}
           <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
             <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Navigation Buttons */}
-        <View style={styles.navigationContainer}>
-          <TouchableOpacity style={styles.navButton}>
-            <Text style={styles.navButtonText}>Categories</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navButton}>
-            <Text style={styles.navButtonText}>Settings</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
