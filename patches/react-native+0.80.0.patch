@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native/ReactCommon/react/performance/timeline/PerformanceObserver.cpp b/node_modules/react-native/ReactCommon/react/performance/timeline/PerformanceObserver.cpp
+index ce64823..f17131d 100644
+--- a/node_modules/react-native/ReactCommon/react/performance/timeline/PerformanceObserver.cpp
++++ b/node_modules/react-native/ReactCommon/react/performance/timeline/PerformanceObserver.cpp
+@@ -16,7 +16,7 @@ void PerformanceObserver::handleEntry(const PerformanceEntry& entry) {
+   auto entryType = std::visit(
+       [](const auto& entryData) { return entryData.entryType; }, entry);
+ 
+-  if (observedTypes_.contains(entryType)) {
++  if (observedTypes_.find(entryType) != observedTypes_.end()) {
+     // https://www.w3.org/TR/event-timing/#should-add-performanceeventtiming
+     if (std::holds_alternative<PerformanceEventTiming>(entry) &&
+         std::get<PerformanceEventTiming>(entry).duration < durationThreshold_) {
