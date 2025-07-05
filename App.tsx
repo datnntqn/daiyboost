@@ -2,12 +2,13 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import {  Image } from 'react-native';
+import { Image } from 'react-native';
 import MainQuoteScreen from './src/screens/MainQuoteScreen';
 import CategoryScreen from './src/screens/CategoryScreen';
 import QuoteListScreen from './src/screens/QuoteListScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import NotificationSettingsScreen from './src/screens/NotificationSettingsScreen';
+import FavoriteQuotesScreen from './src/screens/FavoriteQuotesScreen';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { useTheme } from './src/context/ThemeContext';
 import { createTabBarStyles } from './src/screens/styles/TabBar.styles';
@@ -45,11 +46,16 @@ const getTabBarIcon = (route: string, focused: boolean) => {
     icon = focused 
       ? require('./assets/icons/category-active.png')
       : require('./assets/icons/category-inactive.png');
+  } else if (route === 'Favorites') {
+    icon = focused 
+      ? require('./assets/icons/heart-active.png')
+      : require('./assets/icons/heart-inactive.png');
   } else if (route === 'Settings') {
     icon = focused 
       ? require('./assets/icons/settings-active.png')
       : require('./assets/icons/settings-inactive.png');
   }
+
   return (
     <Image
       source={icon}
@@ -94,6 +100,14 @@ const NavigationWrapper = () => {
         component={CategoriesStackScreen} 
         options={{ 
           title: 'Categories',
+          headerShown: false,
+        }} 
+      />
+      <Tab.Screen 
+        name="Favorites" 
+        component={FavoriteQuotesScreen} 
+        options={{ 
+          title: 'Favorites',
           headerShown: false,
         }} 
       />

@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Alert, SafeAreaView, StatusBar, LogBox } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { quotes } from '../data/quotes';
 import { createStyles } from './styles/MainQuoteScreen.styles';
 import { useTheme } from '../context/ThemeContext';
 import { categoryAssets } from '../constants/categoryAssets';
+import { Quote, CategoryType } from '../types/quote';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -16,15 +18,40 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const styles = createStyles(isDarkMode);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
 
   // Đảm bảo có dữ liệu hợp lệ với useMemo
   const safeQuote = useMemo(() => {
     return quotes && quotes.length > 0 ? quotes[currentQuoteIndex % quotes.length] : {
       id: '0',
       text: 'The best way to predict the future is to create it.',
-      category: 'Productivity'
+      category: 'Productivity' as CategoryType
     };
   }, [currentQuoteIndex]);
+
+  const checkIfFavorite = useCallback(() => {
+    const isFav = favoriteQuotes.some(quote => quote.id === safeQuote.id);
+    setIsFavorite(isFav);
+  }, [favoriteQuotes, safeQuote.id]);
+
+  useEffect(() => {
+    loadFavoriteQuotes();
+  }, []);
+
+  useEffect(() => {
+    checkIfFavorite();
+  }, [checkIfFavorite]);
+
+  const loadFavoriteQuotes = async () => {
+    try {
+      const savedQuotes = await AsyncStorage.getItem('favorite_quotes');
+      if (savedQuotes) {
+        setFavoriteQuotes(JSON.parse(savedQuotes));
+      }
+    } catch (error) {
+      console.error('Error loading favorite quotes:', error);
+    }
+  };
 
   const categoryAsset = categoryAssets[safeQuote.category];
   const gradientColors = isDarkMode ? 
@@ -33,11 +60,23 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
 
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
-    setIsFavorite(false); // Reset favorite for new quote
   };
 
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
+  const toggleFavorite = async () => {
+    try {
+      let updatedFavorites: Quote[];
+      if (isFavorite) {
+        updatedFavorites = favoriteQuotes.filter(quote => quote.id !== safeQuote.id);
+      } else {
+        updatedFavorites = [...favoriteQuotes, safeQuote];
+      }
+      
+      await AsyncStorage.setItem('favorite_quotes', JSON.stringify(updatedFavorites));
+      setFavoriteQuotes(updatedFavorites);
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('Error updating favorite quotes:', error);
+    }
   };
 
   const handleShare = () => {
