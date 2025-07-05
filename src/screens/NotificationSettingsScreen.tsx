@@ -1,126 +1,196 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Switch, TouchableOpacity, Platform, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Switch, TouchableOpacity, Platform, SafeAreaView, ScrollView, Modal } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { styles } from './styles/NotificationSettingsScreen.styles';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import { quotes } from '../data/quotes';
+import NotificationService, { NotificationSettings } from '../services/NotificationService';
+import { styles } from './styles/NotificationSettings.styles';
 
-const NotificationSettingsScreen: React.FC = () => {
-  const [dailyReminder, setDailyReminder] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [preferredTime, setPreferredTime] = useState(new Date());
+const NotificationSettingsScreen = () => {
+  const [settings, setSettings] = useState<NotificationSettings>({
+    isEnabled: false,
+    preferredTime: '09:00',
+    sound: true,
+    vibration: true,
+  });
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [tempTime, setTempTime] = useState(new Date());
 
   useEffect(() => {
-    requestNotificationPermissions();
+    loadSettings();
   }, []);
 
-  const requestNotificationPermissions = () => {
+  const loadSettings = async () => {
+    const savedSettings = await NotificationService.getSettings();
+    setSettings(savedSettings);
+    // Set initial tempTime
+    const [hours, minutes] = savedSettings.preferredTime.split(':');
+    const initialTime = new Date();
+    initialTime.setHours(parseInt(hours, 10));
+    initialTime.setMinutes(parseInt(minutes, 10));
+    setTempTime(initialTime);
+  };
+
+  const handleSettingChange = async (key: keyof NotificationSettings, value: boolean | string) => {
+    const newSettings = { ...settings, [key]: value };
+    setSettings(newSettings);
+    await NotificationService.saveSettings(newSettings);
+  };
+
+  const handleTimeChange = (event: any, selectedDate?: Date) => {
+    if (selectedDate) {
+      setTempTime(selectedDate);
+    }
+  };
+
+  const handleTimePickerDone = () => {
+    const hours = tempTime.getHours().toString().padStart(2, '0');
+    const minutes = tempTime.getMinutes().toString().padStart(2, '0');
+    handleSettingChange('preferredTime', `${hours}:${minutes}`);
+    setShowTimePicker(false);
+  };
+
+  const handleTimePickerCancel = () => {
+    // Reset tempTime to current setting
+    const [hours, minutes] = settings.preferredTime.split(':');
+    const currentTime = new Date();
+    currentTime.setHours(parseInt(hours, 10));
+    currentTime.setMinutes(parseInt(minutes, 10));
+    setTempTime(currentTime);
+    setShowTimePicker(false);
+  };
+
+  const renderTimePicker = () => {
     if (Platform.OS === 'ios') {
-      PushNotificationIOS.requestPermissions().then(
-        (permissions) => {
-          console.log('Permissions:', permissions);
-        },
+      return (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showTimePicker}
+          onRequestClose={handleTimePickerCancel}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <TouchableOpacity onPress={handleTimePickerCancel}>
+                  <Text style={styles.modalCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <Text style={styles.modalTitle}>Choose Time</Text>
+                <TouchableOpacity onPress={handleTimePickerDone}>
+                  <Text style={styles.modalDoneText}>Done</Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={tempTime}
+                mode="time"
+                is24Hour={true}
+                display="spinner"
+                onChange={handleTimeChange}
+                style={styles.dateTimePicker}
+              />
+            </View>
+          </View>
+        </Modal>
       );
     }
-  };
 
-  const scheduleDailyNotification = (time: Date) => {
-    PushNotificationIOS.cancelAllLocalNotifications();
-
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-
-    PushNotificationIOS.scheduleLocalNotification({
-      alertBody: randomQuote.text,
-      alertTitle: 'Daily Boost',
-      fireDate: time.toISOString(),
-      repeatInterval: 'day',
-      userInfo: { id: 'daily_boost_quote', category: randomQuote.category },
-      soundName: soundEnabled ? 'default' : undefined,
-    });
-    Alert.alert('Notification Set', `Daily reminder set for ${time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
-  };
-
-  const onTimeChange = (event: any, selectedDate?: Date) => {
-    const currentTime = selectedDate || preferredTime;
-    setShowTimePicker(Platform.OS === 'ios');
-    setPreferredTime(currentTime);
-    if (dailyReminder) {
-      scheduleDailyNotification(currentTime);
-    }
-  };
-
-  const handleDailyReminderToggle = (value: boolean) => {
-    setDailyReminder(value);
-    if (!value) {
-      PushNotificationIOS.cancelAllLocalNotifications();
-      Alert.alert('Reminders Off', 'Daily reminders have been turned off.');
-    } else {
-      scheduleDailyNotification(preferredTime);
-    }
+    // For Android, show the native picker
+    return showTimePicker && (
+      <DateTimePicker
+        value={tempTime}
+        mode="time"
+        is24Hour={true}
+        display="default"
+        onChange={(event, date) => {
+          setShowTimePicker(false);
+          if (date && event.type !== 'dismissed') {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            handleSettingChange('preferredTime', `${hours}:${minutes}`);
+          }
+        }}
+      />
+    );
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Notification{'\n'}Settings</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView bounces={false}>
+        <View style={styles.content}>
+          <View style={styles.section}>
+            <View>
+              <Text style={styles.sectionTitle}>Daily Reminder</Text>
+              <Text style={styles.sectionDescription}>Get daily inspirational quotes</Text>
+            </View>
+            <Switch
+              value={settings.isEnabled}
+              onValueChange={(value) => handleSettingChange('isEnabled', value)}
+              trackColor={{ false: '#E2E8F0', true: '#93C5FD' }}
+              thumbColor={settings.isEnabled ? '#3B82F6' : '#FFFFFF'}
+              style={styles.switch}
+            />
+          </View>
 
-      <View style={styles.settingItem}>
-        <Text style={styles.settingText}>Daily Reminder</Text>
-        <Switch
-          style={styles.switch}
-          onValueChange={handleDailyReminderToggle}
-          value={dailyReminder}
-          trackColor={{ false: '#E0E0E0', true: '#A8C8EC' }}
-          thumbColor={dailyReminder ? '#5DADE2' : '#FFFFFF'}
-        />
-      </View>
+          <View style={styles.timeSection}>
+            <TouchableOpacity 
+              style={styles.timeHeader} 
+              onPress={() => setShowTimePicker(true)}
+              disabled={!settings.isEnabled}
+            >
+              <View>
+                <Text style={[styles.sectionTitle, !settings.isEnabled && styles.disabledText]}>
+                  Preferred Time
+                </Text>
+                <Text style={[styles.sectionDescription, !settings.isEnabled && styles.disabledText]}>
+                  When would you like to receive quotes?
+                </Text>
+              </View>
+              <Text style={[styles.timeText, !settings.isEnabled && styles.disabledText]}>
+                {settings.preferredTime}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-      <TouchableOpacity style={styles.settingItem} onPress={() => setShowTimePicker(true)}>
-        <Text style={styles.settingText}>Preferred Time</Text>
-        <Text style={styles.settingValue}>
-          {preferredTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </Text>
-      </TouchableOpacity>
+          {renderTimePicker()}
 
-      {showTimePicker && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={preferredTime}
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={onTimeChange}
-        />
-      )}
+          <View style={styles.section}>
+            <View>
+              <Text style={[styles.sectionTitle, !settings.isEnabled && styles.disabledText]}>
+                Sound
+              </Text>
+              <Text style={[styles.sectionDescription, !settings.isEnabled && styles.disabledText]}>
+                Play sound with notifications
+              </Text>
+            </View>
+            <Switch
+              value={settings.sound}
+              onValueChange={(value) => handleSettingChange('sound', value)}
+              trackColor={{ false: '#E2E8F0', true: '#93C5FD' }}
+              thumbColor={settings.sound ? '#3B82F6' : '#FFFFFF'}
+              style={styles.switch}
+              disabled={!settings.isEnabled}
+            />
+          </View>
 
-      <View style={styles.settingItem}>
-        <Text style={styles.settingText}>Sound</Text>
-        <Switch
-          style={styles.switch}
-          onValueChange={setSoundEnabled}
-          value={soundEnabled}
-          trackColor={{ false: '#E0E0E0', true: '#A8C8EC' }}
-          thumbColor={soundEnabled ? '#5DADE2' : '#FFFFFF'}
-        />
-      </View>
-
-      <View style={styles.settingItem}>
-        <Text style={styles.settingText}>Vibration</Text>
-        <Switch
-          style={styles.switch}
-          onValueChange={setVibrationEnabled}
-          value={vibrationEnabled}
-          trackColor={{ false: '#E0E0E0', true: '#A8C8EC' }}
-          thumbColor={vibrationEnabled ? '#5DADE2' : '#FFFFFF'}
-        />
-      </View>
-
-      {/* Ad Space Placeholder */}
-      <View style={styles.adSpace}>
-        <Text style={styles.adText}>Ad</Text>
-      </View>
-    </View>
+          <View style={styles.section}>
+            <View>
+              <Text style={[styles.sectionTitle, !settings.isEnabled && styles.disabledText]}>
+                Vibration
+              </Text>
+              <Text style={[styles.sectionDescription, !settings.isEnabled && styles.disabledText]}>
+                Vibrate with notifications
+              </Text>
+            </View>
+            <Switch
+              value={settings.vibration}
+              onValueChange={(value) => handleSettingChange('vibration', value)}
+              trackColor={{ false: '#E2E8F0', true: '#93C5FD' }}
+              thumbColor={settings.vibration ? '#3B82F6' : '#FFFFFF'}
+              style={styles.switch}
+              disabled={!settings.isEnabled}
+            />
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

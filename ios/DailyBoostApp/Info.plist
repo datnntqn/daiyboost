@@ -58,7 +58,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSUserNotificationsUsageDescription</key>
-	<string>We need to send you daily motivational quotes</string>
+	<string>We need to send you daily inspirational quotes</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
