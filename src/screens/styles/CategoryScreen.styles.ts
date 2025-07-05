@@ -1,108 +1,72 @@
-import { StyleSheet, Platform } from 'react-native';
-import { lightColors, darkColors } from '../../theme/colors';
+import { StyleSheet, ViewStyle, TextStyle, ImageStyle } from 'react-native';
+import { getThemeColors } from '../../theme/colors';
+import { SCREEN_WIDTH, SCREEN_HEIGHT, getShadowStyle as shadowStyle, getCommonStyles } from '../../theme/styleUtils';
+
+type Style = ViewStyle | TextStyle | ImageStyle;
+type Styles = Record<string, Style>;
 
 export const createStyles = (isDarkMode: boolean) => {
-  const colors = isDarkMode ? darkColors : lightColors;
+  const colors = getThemeColors(isDarkMode);
+  const commonStyles = getCommonStyles(isDarkMode);
 
-  return StyleSheet.create({
-    container: {
+  const styles: Styles = {
+    ...commonStyles,
+    backgroundImage: {
+      position: 'absolute',
+      width: SCREEN_WIDTH,
+      height: SCREEN_HEIGHT,
+      opacity: 0.8,
+    },
+    gradientOverlay: {
+      position: 'absolute',
+      width: SCREEN_WIDTH,
+      height: SCREEN_HEIGHT,
+      zIndex: 1,
+    },
+    contentContainer: {
       flex: 1,
-      backgroundColor: colors.backgroundSecondary,
-      paddingTop: Platform.OS === 'ios' ? 60 : 40,
+      zIndex: 2,
     },
-    header: {
-      marginBottom: 30,
+    quoteCard: {
+      backgroundColor: colors.cardBackground,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 16,
+      ...shadowStyle(isDarkMode),
     },
-    appTitle: {
-      fontSize: 16,
-      color: '#5DADE2',
-      textAlign: 'left',
-      marginBottom: 5,
-    },
-    title: {
-      fontSize: 32,
-      fontWeight: 'bold',
-      color: '#2C3E50',
-      textAlign: 'left',
-      marginBottom: 30,
-    },
-    searchContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.background,
-      marginHorizontal: 20,
-      marginBottom: 20,
-      borderRadius: 15,
-      paddingHorizontal: 15,
-      paddingVertical: 12,
-      shadowColor: colors.text,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: isDarkMode ? 0.2 : 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    searchIcon: {
-      fontSize: 16,
-      marginRight: 10,
-    },
-    searchBar: {
-      flex: 1,
+    quoteText: {
       fontSize: 16,
       color: colors.text,
-      padding: 0,
+      marginBottom: 12,
     },
-    listContainer: {
-      paddingHorizontal: 20,
-      paddingBottom: Platform.OS === 'ios' ? 120 : 100,
+    favoriteButton: {
+      alignSelf: 'flex-end' as const,
     },
-    categoryItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.background,
-      padding: 20,
-      borderRadius: 15,
-      marginBottom: 15,
-      shadowColor: colors.text,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: isDarkMode ? 0.2 : 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    categoryIcon: {
+    favoriteIcon: {
       fontSize: 24,
-      marginRight: 15,
-      width: 30,
-      textAlign: 'center',
     },
-    categoryText: {
-      fontSize: 18,
-      color: colors.text,
-      fontWeight: '500',
+    emptyContainer: {
       flex: 1,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      padding: 20,
     },
-    adBanner: {
-      backgroundColor: isDarkMode ? colors.cardBackground : '#E8F4FD',
-      marginHorizontal: 20,
-      marginBottom: Platform.OS === 'ios' ? 100 : 80,
-      padding: 15,
-      borderRadius: 15,
-      alignItems: 'center',
+    emptyText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 12,
+      textAlign: 'center' as const,
     },
-    adText: {
-      color: colors.textSecondary,
+    emptySubText: {
       fontSize: 16,
+      color: colors.subText,
+      textAlign: 'center' as const,
     },
-  });
+  };
+
+  return StyleSheet.create(styles);
 };
+
 
 

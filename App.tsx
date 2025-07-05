@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Image } from 'react-native';
 import MainQuoteScreen from './src/screens/MainQuoteScreen';
 import CategoryScreen from './src/screens/CategoryScreen';
+import CategoriesScreen from './src/screens/CategoriesScreen';
 import QuoteListScreen from './src/screens/QuoteListScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import NotificationSettingsScreen from './src/screens/NotificationSettingsScreen';
@@ -21,8 +22,21 @@ const CategoryStack = createNativeStackNavigator();
 function CategoriesStackScreen() {
   return (
     <CategoryStack.Navigator>
-      <CategoryStack.Screen name="Category" component={CategoryScreen} options={{ headerShown: false }} />
-      <CategoryStack.Screen name="QuoteList" component={QuoteListScreen as React.ComponentType<any>} options={{ title: 'Quotes' }} />
+      <CategoryStack.Screen 
+        name="Categories" 
+        component={CategoriesScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CategoryStack.Screen 
+        name="Category" 
+        component={CategoryScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CategoryStack.Screen 
+        name="QuoteList" 
+        component={QuoteListScreen} 
+        options={{ title: 'Quotes' }} 
+      />
     </CategoryStack.Navigator>
   );
 }

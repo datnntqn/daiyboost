@@ -1,3 +1,25 @@
+interface ThemeColors {
+  background: string;
+  cardBackground: string;
+  cardBorder: string;
+  text: string;
+  subText: string;
+  headerText: string;
+  gradientOverlay: string[];
+}
+
+export const getThemeColors = (isDarkMode: boolean): ThemeColors => ({
+  background: isDarkMode ? '#1a1a1a' : '#ffffff',
+  cardBackground: isDarkMode ? 'rgba(42, 42, 42, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+  cardBorder: isDarkMode ? 'rgba(58, 58, 58, 0.5)' : 'rgba(229, 229, 229, 0.5)',
+  text: isDarkMode ? '#FFFFFF' : '#333333',
+  subText: isDarkMode ? '#AAAAAA' : '#666666',
+  headerText: isDarkMode ? '#FFFFFF' : '#333333',
+  gradientOverlay: isDarkMode 
+    ? ['rgba(26, 26, 26, 0.9)', 'rgba(26, 26, 26, 0.7)']
+    : ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.7)']
+});
+
 export const lightColors = {
   background: '#FFFFFF',
   backgroundSecondary: '#F8FAFC',
