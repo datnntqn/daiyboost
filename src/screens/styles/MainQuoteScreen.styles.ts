@@ -20,19 +20,19 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     quoteCard: {
       width: cardWidth,
-      backgroundColor: colors.background,
+      backgroundColor: isDarkMode ? '#2A2A2A' : colors.background,
       borderRadius: 25,
       padding: 25,
-      shadowColor: colors.text,
+      shadowColor: isDarkMode ? '#000' : colors.text,
       shadowOffset: {
         width: 0,
         height: 4,
       },
-      shadowOpacity: isDarkMode ? 0.3 : 0.1,
+      shadowOpacity: isDarkMode ? 0.5 : 0.1,
       shadowRadius: 8,
-      elevation: 5,
+      elevation: isDarkMode ? 8 : 5,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: isDarkMode ? '#3A3A3A' : colors.border,
     },
     header: {
       flexDirection: 'row',
@@ -43,12 +43,12 @@ export const createStyles = (isDarkMode: boolean) => {
     categoryBadge: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: isDarkMode ? colors.cardBackground : colors.backgroundSecondary,
+      backgroundColor: isDarkMode ? '#3A3A3A' : colors.backgroundSecondary,
       paddingVertical: 8,
       paddingHorizontal: 12,
       borderRadius: 20,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: isDarkMode ? '#4A4A4A' : colors.border,
     },
     categoryIcon: {
       fontSize: 20,
@@ -56,7 +56,7 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     categoryName: {
       fontSize: 14,
-      color: colors.text,
+      color: isDarkMode ? '#FFFFFF' : colors.text,
       fontWeight: '600',
     },
     shareIcon: {
@@ -70,7 +70,7 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     quoteText: {
       fontSize: 20,
-      color: colors.text,
+      color: isDarkMode ? '#FFFFFF' : colors.text,
       textAlign: 'center',
       lineHeight: 32,
       fontWeight: '500',
@@ -84,17 +84,17 @@ export const createStyles = (isDarkMode: boolean) => {
       width: 60,
       height: 60,
       borderRadius: 30,
-      backgroundColor: colors.background,
-      shadowColor: colors.text,
+      backgroundColor: isDarkMode ? '#3A3A3A' : colors.background,
+      shadowColor: isDarkMode ? '#000' : colors.text,
       shadowOffset: {
         width: 0,
         height: 2,
       },
-      shadowOpacity: isDarkMode ? 0.3 : 0.1,
+      shadowOpacity: isDarkMode ? 0.5 : 0.1,
       shadowRadius: 4,
-      elevation: 3,
+      elevation: isDarkMode ? 6 : 3,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: isDarkMode ? '#4A4A4A' : colors.border,
     },
     favoriteButton: {
       width: 60,
@@ -106,6 +106,7 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     favoriteIcon: {
       fontSize: 24,
+      opacity: isDarkMode ? 0.8 : 0.6,
     },
     favoriteIconActive: {
       opacity: 1,
@@ -118,7 +119,7 @@ export const createStyles = (isDarkMode: boolean) => {
       alignItems: 'center',
     },
     nextButtonText: {
-      color: colors.background,
+      color: isDarkMode ? '#FFFFFF' : colors.background,
       fontSize: 18,
       fontWeight: '600',
     },

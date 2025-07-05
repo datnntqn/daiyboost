@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, LogBox } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, SafeAreaView, StatusBar, LogBox } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { quotes } from '../data/quotes';
 import { createStyles } from './styles/MainQuoteScreen.styles';
@@ -46,50 +46,56 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={gradientColors}
-        style={styles.gradientBackground}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-      >
-        {/* Quote Card */}
-        <View style={styles.quoteCard}>
-          {/* Header with Category Badge */}
-          <View style={styles.header}>
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryIcon}>{categoryAsset.emoji}</Text>
-              <Text style={styles.categoryName}>{safeQuote.category}</Text>
+    <View style={styles.container}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={isDarkMode ? '#1a1a1a' : '#ffffff'}
+      />
+      <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' }]}>
+        <LinearGradient
+          colors={gradientColors}
+          style={styles.gradientBackground}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        >
+          {/* Quote Card */}
+          <View style={styles.quoteCard}>
+            {/* Header with Category Badge */}
+            <View style={styles.header}>
+              <View style={styles.categoryBadge}>
+                <Text style={styles.categoryIcon}>{categoryAsset.emoji}</Text>
+                <Text style={styles.categoryName}>{safeQuote.category}</Text>
+              </View>
+              <TouchableOpacity onPress={handleShare}>
+                <Text style={styles.shareIcon}>📤</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={handleShare}>
-              <Text style={styles.shareIcon}>📤</Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* Quote Content */}
-          <View style={styles.quoteContent}>
-            <Text style={styles.quoteText}>
-              {safeQuote.text}
-            </Text>
-          </View>
-
-          {/* Favorite Button (Inside Circle) */}
-          <View style={styles.favoriteContainer}>
-            <View style={styles.favoriteBackground} />
-            <TouchableOpacity style={styles.favoriteButton} onPress={toggleFavorite}>
-              <Text style={[styles.favoriteIcon, isFavorite && styles.favoriteIconActive]}>
-                {isFavorite ? categoryAsset.activeIcon : categoryAsset.icon}
+            {/* Quote Content */}
+            <View style={styles.quoteContent}>
+              <Text style={styles.quoteText}>
+                {safeQuote.text}
               </Text>
+            </View>
+
+            {/* Favorite Button (Inside Circle) */}
+            <View style={styles.favoriteContainer}>
+              <View style={styles.favoriteBackground} />
+              <TouchableOpacity style={styles.favoriteButton} onPress={toggleFavorite}>
+                <Text style={[styles.favoriteIcon, isFavorite && styles.favoriteIconActive]}>
+                  {isFavorite ? categoryAsset.activeIcon : categoryAsset.icon}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Next Button */}
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
+              <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Next Button */}
-          <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-    </SafeAreaView>
+        </LinearGradient>
+      </SafeAreaView>
+    </View>
   );
 };
 
