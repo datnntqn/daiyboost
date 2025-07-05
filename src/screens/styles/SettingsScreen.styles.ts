@@ -113,6 +113,9 @@ export const styles = StyleSheet.create({
     color: '#7F8C8D',
     fontSize: 16,
   },
+  themeToggleText: {
+    fontSize: 24,
+  },
 });
 
 

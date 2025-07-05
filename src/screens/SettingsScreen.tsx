@@ -28,7 +28,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
       <TouchableOpacity 
         style={styles.settingItem} 
-        onPress={() => navigation.navigate('Category')}
+        onPress={() => navigation.navigate('CategoriesStack')}
       >
         <View style={styles.settingContent}>
           <Text style={styles.settingIcon}>🔲</Text>
@@ -53,24 +53,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           <Text style={styles.settingIcon}>☀️</Text>
           <Text style={styles.settingText}>Theme</Text>
         </View>
-        <View style={styles.themeToggleContainer}>
-          <TouchableOpacity
-            style={[styles.themeOption, theme === 'light' && styles.themeOptionSelected]}
-            onPress={() => theme !== 'light' && toggleTheme()}
-          >
-            <Text style={[styles.themeOptionText, theme === 'light' && styles.themeOptionTextSelected]}>
-              Light
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.themeOption, theme === 'dark' && styles.themeOptionSelected]}
-            onPress={() => theme !== 'dark' && toggleTheme()}
-          >
-            <Text style={[styles.themeOptionText, theme === 'dark' && styles.themeOptionTextSelected]}>
-              Dark
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={toggleTheme}>
+          <Text style={styles.themeToggleText}>{theme === 'light' ? '🌞' : '🌙'}</Text>
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.sectionTitle}>Premium Features</Text>

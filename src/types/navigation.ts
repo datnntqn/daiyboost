@@ -7,6 +7,7 @@ export type RootStackParamList = {
   QuoteList: { category: string };
   NotificationSettings: undefined;
   Settings: undefined;
+  CategoriesStack: undefined;
 };
 
 export type { Quote, CategoryData as Category };

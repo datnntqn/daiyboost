@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, LogBox, Modal, Pressable } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, TouchableOpacity, Alert, SafeAreaView, LogBox } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { quotes } from '../data/quotes';
 import { styles } from './styles/MainQuoteScreen.styles';
-import { useNavigation } from '@react-navigation/native';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -13,8 +12,6 @@ type MainQuoteScreenProps = {};
 const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const navigation = useNavigation();
 
   // Đảm bảo có dữ liệu hợp lệ với useMemo
   const safeQuote = useMemo(() => {
@@ -38,16 +35,6 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const handleShare = () => {
     // Share functionality would go here
     Alert.alert('Share', 'Share functionality would be implemented here');
-  };
-
-  // Handler cho menu
-  const handleMenuSelect = (type: 'categories' | 'settings') => {
-    setMenuVisible(false);
-    if (type === 'categories') {
-      navigation.navigate('Category' as never);
-    } else {
-      navigation.navigate('Settings' as never);
-    }
   };
 
   return (
