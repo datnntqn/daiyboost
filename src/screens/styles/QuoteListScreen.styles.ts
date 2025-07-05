@@ -1,67 +1,66 @@
 import { StyleSheet } from 'react-native';
+import { lightColors, darkColors } from '../../theme/colors';
 
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-  },
-  header: {
-    marginBottom: 30,
-  },
-  appTitle: {
-    fontSize: 16,
-    color: '#5DADE2',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  listContainer: {
-    paddingBottom: 100,
-  },
-  quoteItem: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
+export const createStyles = (isDarkMode: boolean) => {
+  const colors = isDarkMode ? darkColors : lightColors;
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.backgroundSecondary,
+      paddingTop: 60,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#F5F5F5',
-  },
-  quoteText: {
-    fontSize: 16,
-    color: '#2C3E50',
-    lineHeight: 24,
-    flex: 1,
-    marginRight: 15,
-  },
-  favoriteButton: {
-    padding: 5,
-  },
-  favoriteIcon: {
-    fontSize: 20,
-    color: '#BDC3C7',
-  },
-  favoriteIconActive: {
-    color: '#E74C3C',
-  },
-});
+    header: {
+      paddingHorizontal: 20,
+      marginBottom: 30,
+    },
+    appTitle: {
+      fontSize: 16,
+      color: colors.primary,
+      marginBottom: 5,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 20,
+    },
+    listContainer: {
+      paddingHorizontal: 20,
+      paddingBottom: 20,
+    },
+    quoteItem: {
+      backgroundColor: colors.background,
+      padding: 20,
+      borderRadius: 15,
+      marginBottom: 15,
+      shadowColor: colors.text,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: isDarkMode ? 0.2 : 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    quoteText: {
+      fontSize: 16,
+      color: colors.text,
+      lineHeight: 24,
+      marginBottom: 15,
+    },
+    favoriteButton: {
+      alignSelf: 'flex-end',
+    },
+    favoriteIcon: {
+      fontSize: 20,
+    },
+    favoriteIconActive: {
+      opacity: 1,
+    },
+  });
+};
 
 

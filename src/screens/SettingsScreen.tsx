@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
-import { styles } from './styles/SettingsScreen.styles';
+import { createStyles } from './styles/SettingsScreen.styles';
 import { RootStackParamList } from '../types/navigation';
 
 type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
@@ -12,7 +12,8 @@ type SettingsScreenProps = {
 };
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
-  const { theme, toggleTheme } = useTheme();
+  const { toggleTheme, isDarkMode } = useTheme();
+  const styles = createStyles(isDarkMode);
 
   return (
     <View style={styles.container}>
@@ -50,11 +51,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 
       <View style={styles.settingItem}>
         <View style={styles.settingContent}>
-          <Text style={styles.settingIcon}>☀️</Text>
+          <Text style={styles.settingIcon}>{isDarkMode ? '🌙' : '☀️'}</Text>
           <Text style={styles.settingText}>Theme</Text>
         </View>
         <TouchableOpacity onPress={toggleTheme}>
-          <Text style={styles.themeToggleText}>{theme === 'light' ? '🌞' : '🌙'}</Text>
+          <Text style={styles.themeToggleText}>{isDarkMode ? '🌙' : '🌞'}</Text>
         </TouchableOpacity>
       </View>
 

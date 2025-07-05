@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { quotes, Quote } from '../data/quotes';
-import { styles } from './styles/QuoteListScreen.styles';
+import { createStyles } from './styles/QuoteListScreen.styles';
 import { RootStackParamList } from '../types/navigation';
+import { useTheme } from '../context/ThemeContext';
 
 type QuoteListScreenProps = NativeStackScreenProps<RootStackParamList, 'QuoteList'>;
 
 const QuoteListScreen: React.FC<QuoteListScreenProps> = ({ route }) => {
   const { category } = route.params;
+  const { isDarkMode } = useTheme();
+  const styles = createStyles(isDarkMode);
   const [favoriteQuotes, setFavoriteQuotes] = useState<string[]>([]);
 
   const filteredQuotes = quotes.filter(quote => quote.category === category);

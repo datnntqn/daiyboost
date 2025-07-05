@@ -2,13 +2,16 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Platform, Image } from 'react-native';
+import {  Image } from 'react-native';
 import MainQuoteScreen from './src/screens/MainQuoteScreen';
 import CategoryScreen from './src/screens/CategoryScreen';
 import QuoteListScreen from './src/screens/QuoteListScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import NotificationSettingsScreen from './src/screens/NotificationSettingsScreen';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { useTheme } from './src/context/ThemeContext';
+import { createTabBarStyles } from './src/screens/styles/TabBar.styles';
+import { lightColors, darkColors } from './src/theme/colors';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -61,68 +64,55 @@ const getTabBarIcon = (route: string, focused: boolean) => {
   );
 };
 
+const NavigationWrapper = () => {
+  const { isDarkMode } = useTheme();
+  const tabBarStyles = createTabBarStyles(isDarkMode);
+  const colors = isDarkMode ? darkColors : lightColors;
+
+  return (
+    <Tab.Navigator
+      initialRouteName="MainQuote"
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused }) => getTabBarIcon(route.name, focused),
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarShowLabel: true,
+        tabBarLabelStyle: tabBarStyles.tabBarLabel,
+        tabBarStyle: tabBarStyles.tabBar,
+      })}
+    >
+      <Tab.Screen 
+        name="MainQuote" 
+        component={MainQuoteScreen} 
+        options={{ 
+          title: 'Quote',
+          headerShown: false,
+        }} 
+      />
+      <Tab.Screen 
+        name="CategoriesStack" 
+        component={CategoriesStackScreen} 
+        options={{ 
+          title: 'Categories',
+          headerShown: false,
+        }} 
+      />
+      <Tab.Screen 
+        name="Settings" 
+        component={SettingsStackScreen} 
+        options={{ 
+          headerShown: false,
+        }} 
+      />
+    </Tab.Navigator>
+  );
+};
+
 const App = () => {
   return (
     <ThemeProvider>
       <NavigationContainer>
-        <Tab.Navigator
-          initialRouteName="MainQuote"
-          screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused }) => getTabBarIcon(route.name, focused),
-            tabBarActiveTintColor: '#5DADE2',
-            tabBarInactiveTintColor: '#95A5A6',
-            tabBarShowLabel: true,
-            tabBarLabelStyle: { 
-              fontSize: 12,
-              fontWeight: '500',
-              marginBottom: Platform.OS === 'ios' ? 0 : 4,
-            },
-            tabBarStyle: {
-              position: 'absolute',
-              left: 20,
-              right: 20,
-              bottom: Platform.OS === 'ios' ? 24 : 16,
-              height: Platform.OS === 'ios' ? 80 : 70,
-              paddingTop: Platform.OS === 'ios' ? 12 : 8,
-              paddingBottom: Platform.OS === 'ios' ? 24 : 8,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 24,
-              shadowColor: '#000000',
-              shadowOffset: { 
-                width: 0, 
-                height: 4 
-              },
-              shadowOpacity: 0.1,
-              shadowRadius: 12,
-              elevation: 8,
-              borderTopWidth: 0,
-            },
-          })}
-        >
-          <Tab.Screen 
-            name="MainQuote" 
-            component={MainQuoteScreen} 
-            options={{ 
-              title: 'Quote',
-              headerShown: false,
-            }} 
-          />
-          <Tab.Screen 
-            name="CategoriesStack" 
-            component={CategoriesStackScreen} 
-            options={{ 
-              title: 'Categories',
-              headerShown: false,
-            }} 
-          />
-          <Tab.Screen 
-            name="Settings" 
-            component={SettingsStackScreen} 
-            options={{ 
-              headerShown: false,
-            }} 
-          />
-        </Tab.Navigator>
+        <NavigationWrapper />
       </NavigationContainer>
     </ThemeProvider>
   );

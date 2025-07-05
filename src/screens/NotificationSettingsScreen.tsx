@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Switch, TouchableOpacity, Platform, SafeAreaView, ScrollView, Modal } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import NotificationService, { NotificationSettings } from '../services/NotificationService';
-import { styles } from './styles/NotificationSettings.styles';
+import { createStyles } from './styles/NotificationSettings.styles';
+import { useTheme } from '../context/ThemeContext';
+import { lightColors, darkColors } from '../theme/colors';
 
 const NotificationSettingsScreen = () => {
+  const { isDarkMode } = useTheme();
+  const styles = createStyles(isDarkMode);
   const [settings, setSettings] = useState<NotificationSettings>({
     isEnabled: false,
     preferredTime: '09:00',
@@ -123,8 +127,11 @@ const NotificationSettingsScreen = () => {
             <Switch
               value={settings.isEnabled}
               onValueChange={(value) => handleSettingChange('isEnabled', value)}
-              trackColor={{ false: '#E2E8F0', true: '#93C5FD' }}
-              thumbColor={settings.isEnabled ? '#3B82F6' : '#FFFFFF'}
+              trackColor={{ false: isDarkMode ? darkColors.switchTrackInactive : lightColors.switchTrackInactive, 
+                          true: isDarkMode ? darkColors.switchTrackActive : lightColors.switchTrackActive }}
+              thumbColor={settings.isEnabled ? 
+                (isDarkMode ? darkColors.switchThumbActive : lightColors.switchThumbActive) : 
+                (isDarkMode ? darkColors.switchThumbInactive : lightColors.switchThumbInactive)}
               style={styles.switch}
             />
           </View>
@@ -163,8 +170,11 @@ const NotificationSettingsScreen = () => {
             <Switch
               value={settings.sound}
               onValueChange={(value) => handleSettingChange('sound', value)}
-              trackColor={{ false: '#E2E8F0', true: '#93C5FD' }}
-              thumbColor={settings.sound ? '#3B82F6' : '#FFFFFF'}
+              trackColor={{ false: isDarkMode ? darkColors.switchTrackInactive : lightColors.switchTrackInactive, 
+                          true: isDarkMode ? darkColors.switchTrackActive : lightColors.switchTrackActive }}
+              thumbColor={settings.sound ? 
+                (isDarkMode ? darkColors.switchThumbActive : lightColors.switchThumbActive) : 
+                (isDarkMode ? darkColors.switchThumbInactive : lightColors.switchThumbInactive)}
               style={styles.switch}
               disabled={!settings.isEnabled}
             />
@@ -182,8 +192,11 @@ const NotificationSettingsScreen = () => {
             <Switch
               value={settings.vibration}
               onValueChange={(value) => handleSettingChange('vibration', value)}
-              trackColor={{ false: '#E2E8F0', true: '#93C5FD' }}
-              thumbColor={settings.vibration ? '#3B82F6' : '#FFFFFF'}
+              trackColor={{ false: isDarkMode ? darkColors.switchTrackInactive : lightColors.switchTrackInactive, 
+                          true: isDarkMode ? darkColors.switchTrackActive : lightColors.switchTrackActive }}
+              thumbColor={settings.vibration ? 
+                (isDarkMode ? darkColors.switchThumbActive : lightColors.switchThumbActive) : 
+                (isDarkMode ? darkColors.switchThumbInactive : lightColors.switchThumbInactive)}
               style={styles.switch}
               disabled={!settings.isEnabled}
             />

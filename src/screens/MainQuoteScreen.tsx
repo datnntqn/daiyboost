@@ -2,7 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Alert, SafeAreaView, LogBox } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { quotes } from '../data/quotes';
-import { styles } from './styles/MainQuoteScreen.styles';
+import { createStyles } from './styles/MainQuoteScreen.styles';
+import { useTheme } from '../context/ThemeContext';
+import { categoryAssets } from '../constants/categoryAssets';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -10,6 +12,8 @@ LogBox.ignoreLogs(['Require cycle:']);
 type MainQuoteScreenProps = {};
 
 const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
+  const { isDarkMode } = useTheme();
+  const styles = createStyles(isDarkMode);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -21,7 +25,11 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
       category: 'Productivity'
     };
   }, [currentQuoteIndex]);
-  
+
+  const categoryAsset = categoryAssets[safeQuote.category];
+  const gradientColors = isDarkMode ? 
+    ['#1a1a1a', '#2d2d2d'] : 
+    categoryAsset.gradient;
 
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
@@ -40,16 +48,19 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={['#E8F4FD', '#FFE5D9']}
+        colors={gradientColors}
         style={styles.gradientBackground}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       >
         {/* Quote Card */}
         <View style={styles.quoteCard}>
-          {/* Header with Category Icons */}
+          {/* Header with Category Badge */}
           <View style={styles.header}>
-            <Text style={styles.categoryIcon}>📮</Text>
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryIcon}>{categoryAsset.emoji}</Text>
+              <Text style={styles.categoryName}>{safeQuote.category}</Text>
+            </View>
             <TouchableOpacity onPress={handleShare}>
               <Text style={styles.shareIcon}>📤</Text>
             </TouchableOpacity>
@@ -57,7 +68,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
 
           {/* Quote Content */}
           <View style={styles.quoteContent}>
-            <Text style={[styles.quoteText, {opacity: 1}]}>
+            <Text style={styles.quoteText}>
               {safeQuote.text}
             </Text>
           </View>
@@ -67,7 +78,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
             <View style={styles.favoriteBackground} />
             <TouchableOpacity style={styles.favoriteButton} onPress={toggleFavorite}>
               <Text style={[styles.favoriteIcon, isFavorite && styles.favoriteIconActive]}>
-                {isFavorite ? '❤️' : '🤍'}
+                {isFavorite ? categoryAsset.activeIcon : categoryAsset.icon}
               </Text>
             </TouchableOpacity>
           </View>

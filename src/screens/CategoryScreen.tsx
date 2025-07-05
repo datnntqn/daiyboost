@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { categories } from '../data/quotes';
-import { styles } from './styles/CategoryScreen.styles';
+import { createStyles } from './styles/CategoryScreen.styles';
 import { RootStackParamList, Category } from '../types/navigation';
+import { useTheme } from '../context/ThemeContext';
+import { lightColors, darkColors } from '../theme/colors';
 
 type CategoryScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Category'>;
 
@@ -21,6 +23,8 @@ const categoryIcons: Record<string, string> = {
 };
 
 const CategoryScreen: React.FC<CategoryScreenProps> = ({ navigation }) => {
+  const { isDarkMode } = useTheme();
+  const styles = createStyles(isDarkMode);
   const [searchText, setSearchText] = useState('');
 
   const filteredCategories = categories.filter(category =>
@@ -41,13 +45,12 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      
       <View style={styles.searchContainer}>
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
           style={styles.searchBar}
           placeholder="Search categories"
-          placeholderTextColor="#BDC3C7"
+          placeholderTextColor={isDarkMode ? darkColors.textSecondary : lightColors.textSecondary}
           value={searchText}
           onChangeText={setSearchText}
         />

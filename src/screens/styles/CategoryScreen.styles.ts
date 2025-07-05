@@ -1,101 +1,108 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
+import { lightColors, darkColors } from '../../theme/colors';
 
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-  },
-  header: {
-    marginBottom: 30,
-  },
-  appTitle: {
-    fontSize: 16,
-    color: '#5DADE2',
-    textAlign: 'left',
-    marginBottom: 5,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    textAlign: 'left',
-    marginBottom: 30,
-  },
-  searchContainer: {
-    marginBottom: 30,
-  },
-  searchBar: {
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    fontSize: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
+export const createStyles = (isDarkMode: boolean) => {
+  const colors = isDarkMode ? darkColors : lightColors;
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.backgroundSecondary,
+      paddingTop: Platform.OS === 'ios' ? 60 : 40,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 3.84,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: 15,
-    top: 15,
-    fontSize: 16,
-    color: '#BDC3C7',
-  },
-  listContainer: {
-    paddingBottom: 100,
-  },
-  categoryItem: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    borderRadius: 15,
-    marginBottom: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
+    header: {
+      marginBottom: 30,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#F5F5F5',
-  },
-  categoryIcon: {
-    fontSize: 20,
-    marginRight: 15,
-    width: 25,
-    textAlign: 'center',
-  },
-  categoryText: {
-    fontSize: 18,
-    color: '#2C3E50',
-    fontWeight: '500',
-    flex: 1,
-  },
-  adBanner: {
-    backgroundColor: '#E8F4FD',
-    padding: 15,
-    borderRadius: 15,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  adText: {
-    fontSize: 16,
-    color: '#7F8C8D',
-  },
-});
+    appTitle: {
+      fontSize: 16,
+      color: '#5DADE2',
+      textAlign: 'left',
+      marginBottom: 5,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: '#2C3E50',
+      textAlign: 'left',
+      marginBottom: 30,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      marginHorizontal: 20,
+      marginBottom: 20,
+      borderRadius: 15,
+      paddingHorizontal: 15,
+      paddingVertical: 12,
+      shadowColor: colors.text,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: isDarkMode ? 0.2 : 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    searchIcon: {
+      fontSize: 16,
+      marginRight: 10,
+    },
+    searchBar: {
+      flex: 1,
+      fontSize: 16,
+      color: colors.text,
+      padding: 0,
+    },
+    listContainer: {
+      paddingHorizontal: 20,
+      paddingBottom: Platform.OS === 'ios' ? 120 : 100,
+    },
+    categoryItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+      padding: 20,
+      borderRadius: 15,
+      marginBottom: 15,
+      shadowColor: colors.text,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: isDarkMode ? 0.2 : 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    categoryIcon: {
+      fontSize: 24,
+      marginRight: 15,
+      width: 30,
+      textAlign: 'center',
+    },
+    categoryText: {
+      fontSize: 18,
+      color: colors.text,
+      fontWeight: '500',
+      flex: 1,
+    },
+    adBanner: {
+      backgroundColor: isDarkMode ? colors.cardBackground : '#E8F4FD',
+      marginHorizontal: 20,
+      marginBottom: Platform.OS === 'ios' ? 100 : 80,
+      padding: 15,
+      borderRadius: 15,
+      alignItems: 'center',
+    },
+    adText: {
+      color: colors.textSecondary,
+      fontSize: 16,
+    },
+  });
+};
 
 
