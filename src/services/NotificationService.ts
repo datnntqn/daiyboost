@@ -1,9 +1,13 @@
-import PushNotification from 'react-native-push-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-
-const NOTIFICATION_SETTINGS_KEY = '@notification_settings';
-const QUOTES_DATA_KEY = '@quotes_data';
+import notifee, { 
+  AndroidImportance, 
+  AndroidStyle, 
+  TimestampTrigger, 
+  TriggerType,
+  RepeatFrequency,
+} from '@notifee/react-native';
+import { quotes } from '../data/quotes';
+import { categoryAssets } from '../constants/categoryAssets';
 
 export interface NotificationSettings {
   isEnabled: boolean;
@@ -11,6 +15,8 @@ export interface NotificationSettings {
   sound: boolean;
   vibration: boolean;
 }
+
+const SETTINGS_KEY = '@notification_settings';
 
 const defaultSettings: NotificationSettings = {
   isEnabled: false,
@@ -20,117 +26,126 @@ const defaultSettings: NotificationSettings = {
 };
 
 class NotificationService {
-  constructor() {
-    this.configure();
+  private static instance: NotificationService;
+  private settings: NotificationSettings = defaultSettings;
+
+  private constructor() {}
+
+  static getInstance(): NotificationService {
+    if (!NotificationService.instance) {
+      NotificationService.instance = new NotificationService();
+    }
+    return NotificationService.instance;
   }
 
-  configure = () => {
-    PushNotification.configure({
-      onRegister: function (token) {
-        console.log('TOKEN:', token);
-      },
-      onNotification: function (notification) {
-        console.log('NOTIFICATION:', notification);
-      },
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-      popInitialNotification: true,
-      requestPermissions: Platform.OS === 'ios',
-    });
-
-    // Configure channel for Android
-    if (Platform.OS === 'android') {
-      PushNotification.createChannel(
-        {
-          channelId: 'daily-quotes',
-          channelName: 'Daily Quotes',
-          channelDescription: 'Daily inspirational quotes notifications',
-          playSound: true,
-          soundName: 'default',
-          importance: 4,
-          vibrate: true,
-        },
-        (created) => console.log(`Channel created: ${created}`)
-      );
-    }
-  };
-
-  getSettings = async (): Promise<NotificationSettings> => {
+  async getSettings(): Promise<NotificationSettings> {
     try {
-      const settings = await AsyncStorage.getItem(NOTIFICATION_SETTINGS_KEY);
-      return settings ? JSON.parse(settings) : defaultSettings;
+      const savedSettings = await AsyncStorage.getItem(SETTINGS_KEY);
+      if (savedSettings) {
+        this.settings = JSON.parse(savedSettings);
+      }
     } catch (error) {
-      console.error('Error getting notification settings:', error);
-      return defaultSettings;
+      console.error('Error loading notification settings:', error);
     }
-  };
+    return this.settings;
+  }
 
-  saveSettings = async (settings: NotificationSettings): Promise<void> => {
+  async saveSettings(settings: NotificationSettings): Promise<void> {
     try {
-      await AsyncStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(settings));
+      await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      this.settings = settings;
+      
       if (settings.isEnabled) {
-        this.scheduleDailyNotification(settings);
+        await this.scheduleNotification();
       } else {
-        this.cancelAllNotifications();
+        await this.cancelAllNotifications();
       }
     } catch (error) {
       console.error('Error saving notification settings:', error);
     }
-  };
+  }
 
-  getRandomQuote = async (): Promise<string> => {
+  private getRandomQuote() {
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    return quotes[randomIndex];
+  }
+
+  async scheduleNotification(): Promise<void> {
     try {
-      const quotesData = await AsyncStorage.getItem(QUOTES_DATA_KEY);
-      const quotes = quotesData ? JSON.parse(quotesData) : [];
-      if (quotes.length === 0) {
-        return 'Be the change you wish to see in the world.';
+      // Cancel existing notifications first
+      await this.cancelAllNotifications();
+
+      const [hours, minutes] = this.settings.preferredTime.split(':');
+      const now = new Date();
+      const scheduledTime = new Date();
+      scheduledTime.setHours(parseInt(hours, 10));
+      scheduledTime.setMinutes(parseInt(minutes, 10));
+      scheduledTime.setSeconds(0);
+
+      // If the time has passed for today, schedule for tomorrow
+      if (scheduledTime.getTime() <= now.getTime()) {
+        scheduledTime.setDate(scheduledTime.getDate() + 1);
       }
-      return quotes[Math.floor(Math.random() * quotes.length)].text;
+
+      const randomQuote = this.getRandomQuote();
+      const categoryAsset = categoryAssets[randomQuote.category];
+
+      // Create a channel
+      const channelId = await notifee.createChannel({
+        id: 'daily_quotes',
+        name: 'Daily Quotes',
+        importance: AndroidImportance.HIGH,
+        sound: this.settings.sound ? 'default' : undefined,
+        vibration: this.settings.vibration,
+      });
+
+      // Create a trigger
+      const trigger: TimestampTrigger = {
+        type: TriggerType.TIMESTAMP,
+        timestamp: scheduledTime.getTime(),
+        repeatFrequency: RepeatFrequency.DAILY,
+      };
+
+      // Display notification
+      await notifee.createTriggerNotification(
+        {
+          title: `${categoryAsset.emoji} Daily ${randomQuote.category} Quote`,
+          body: randomQuote.text,
+          android: {
+            channelId,
+            importance: AndroidImportance.HIGH,
+            sound: this.settings.sound ? 'default' : undefined,
+            vibrationPattern: this.settings.vibration ? [300, 500] : undefined,
+            style: {
+              type: AndroidStyle.BIGTEXT,
+              text: randomQuote.text,
+            },
+            pressAction: {
+              id: 'default',
+            },
+          },
+          ios: {
+            sound: this.settings.sound ? 'default' : undefined,
+            categoryId: 'daily_quotes',
+            threadId: 'daily_quotes',
+            critical: true,
+            criticalVolume: 0.8,
+          },
+        },
+        trigger,
+      );
     } catch (error) {
-      console.error('Error getting random quote:', error);
-      return 'Be the change you wish to see in the world.';
+      console.error('Error scheduling notification:', error);
     }
-  };
+  }
 
-  scheduleDailyNotification = async (settings: NotificationSettings) => {
-    const [hours, minutes] = settings.preferredTime.split(':');
-    const quote = await this.getRandomQuote();
-
-    // Cancel existing notifications
-    this.cancelAllNotifications();
-
-    // Schedule new notification
-    PushNotification.localNotificationSchedule({
-      channelId: 'daily-quotes',
-      title: 'Daily Quote',
-      message: quote,
-      date: this.getNextNotificationDate(hours, minutes),
-      repeatType: 'day',
-      playSound: settings.sound,
-      vibrate: settings.vibration,
-    });
-  };
-
-  getNextNotificationDate = (hours: string, minutes: string): Date => {
-    const now = new Date();
-    const scheduledTime = new Date();
-    scheduledTime.setHours(parseInt(hours, 10));
-    scheduledTime.setMinutes(parseInt(minutes, 10));
-    scheduledTime.setSeconds(0);
-
-    if (scheduledTime <= now) {
-      scheduledTime.setDate(scheduledTime.getDate() + 1);
+  async cancelAllNotifications(): Promise<void> {
+    try {
+      await notifee.cancelAllNotifications();
+    } catch (error) {
+      console.error('Error canceling notifications:', error);
     }
-
-    return scheduledTime;
-  };
-
-  cancelAllNotifications = () => {
-    PushNotification.cancelAllLocalNotifications();
-  };
+  }
 }
 
-export default new NotificationService(); 
+export default NotificationService.getInstance(); 
