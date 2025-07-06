@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, StatusBar, LogBox } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, StatusBar, LogBox } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { quotes } from '../data/quotes';
@@ -79,10 +79,10 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     }
   };
 
-  const handleShare = () => {
-    // Share functionality would go here
-    Alert.alert('Share', 'Share functionality would be implemented here');
-  };
+  // const handleShare = () => {
+  //   // Share functionality would go here
+  //   Alert.alert('Share', 'Share functionality would be implemented here');
+  // };
 
   return (
     <View style={styles.container}>
@@ -90,6 +90,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={isDarkMode ? '#1a1a1a' : '#ffffff'}
       />
+      {/* eslint-disable-next-line react-native/no-inline-styles */}
       <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' }]}>
         <LinearGradient
           colors={gradientColors}
@@ -105,9 +106,9 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
                 <Text style={styles.categoryIcon}>{categoryAsset.emoji}</Text>
                 <Text style={styles.categoryName}>{safeQuote.category}</Text>
               </View>
-              <TouchableOpacity onPress={handleShare}>
+              {/* <TouchableOpacity onPress={handleShare}>
                 <Text style={styles.shareIcon}>📤</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             {/* Quote Content */}

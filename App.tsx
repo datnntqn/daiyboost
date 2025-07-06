@@ -14,10 +14,11 @@ import { ThemeProvider } from './src/context/ThemeContext';
 import { useTheme } from './src/context/ThemeContext';
 import { createTabBarStyles } from './src/screens/styles/TabBar.styles';
 import { lightColors, darkColors } from './src/theme/colors';
+import { RootStackParamList } from './src/types/navigation';
 
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
-const CategoryStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const CategoryStack = createNativeStackNavigator<RootStackParamList>();
 
 function CategoriesStackScreen() {
   return (

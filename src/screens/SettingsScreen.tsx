@@ -27,7 +27,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         <Text style={styles.title}>Settings</Text>
       </View>
 
-      <TouchableOpacity 
+      {/* <TouchableOpacity 
         style={styles.settingItem} 
         onPress={() => navigation.navigate('CategoriesStack')}
       >
@@ -36,7 +36,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           <Text style={styles.settingText}>Categories</Text>
         </View>
         <Text style={styles.chevron}>›</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity 
         style={styles.settingItem} 
