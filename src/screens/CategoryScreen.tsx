@@ -140,7 +140,7 @@ const CategoryScreen = () => {
               {categoryAsset.emoji} {category} Quotes
             </Text>
             <Text style={styles.headerSubtitle}>
-              Daily Boost - Find your inspiration
+              Motive Me - Find your inspiration
             </Text>
           </View>
 
