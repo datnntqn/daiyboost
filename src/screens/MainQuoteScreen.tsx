@@ -1,11 +1,19 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, StatusBar, LogBox } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  SafeAreaView, 
+  StatusBar, 
+  LogBox, 
+  ImageBackground,
+  Image,
+  GestureResponderEvent
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LinearGradient from 'react-native-linear-gradient';
 import { quotes } from '../data/quotes';
 import { createStyles } from './styles/MainQuoteScreen.styles';
 import { useTheme } from '../context/ThemeContext';
-import { categoryAssets } from '../constants/categoryAssets';
 import { Quote, CategoryType } from '../types/quote';
 
 // Bỏ qua cảnh báo
@@ -19,13 +27,15 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
+  const [_totalFavorites, setTotalFavorites] = useState(0);
+  const [startY, setStartY] = useState(0);
 
   // Đảm bảo có dữ liệu hợp lệ với useMemo
   const safeQuote = useMemo(() => {
     return quotes && quotes.length > 0 ? quotes[currentQuoteIndex % quotes.length] : {
       id: '0',
-      text: 'The best way to predict the future is to create it.',
-      category: 'Productivity' as CategoryType
+      text: 'Be kind to yourself every day.',
+      category: 'Self-Love' as CategoryType
     };
   }, [currentQuoteIndex]);
 
@@ -40,23 +50,22 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
 
   useEffect(() => {
     checkIfFavorite();
-  }, [checkIfFavorite]);
+  }, [checkIfFavorite, safeQuote.id]);
 
   const loadFavoriteQuotes = async () => {
     try {
       const savedQuotes = await AsyncStorage.getItem('favorite_quotes');
       if (savedQuotes) {
-        setFavoriteQuotes(JSON.parse(savedQuotes));
+        const parsedQuotes = JSON.parse(savedQuotes);
+        setFavoriteQuotes(parsedQuotes);
+        setTotalFavorites(parsedQuotes.length);
       }
     } catch (error) {
       console.error('Error loading favorite quotes:', error);
     }
   };
 
-  const categoryAsset = categoryAssets[safeQuote.category];
-  const gradientColors = isDarkMode ? 
-    ['#1a1a1a', '#2d2d2d'] : 
-    categoryAsset.gradient;
+  const backgroundImage = require('../../assets/beach.jpg');
 
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
@@ -73,68 +82,80 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
       
       await AsyncStorage.setItem('favorite_quotes', JSON.stringify(updatedFavorites));
       setFavoriteQuotes(updatedFavorites);
+      setTotalFavorites(updatedFavorites.length);
       setIsFavorite(!isFavorite);
     } catch (error) {
       console.error('Error updating favorite quotes:', error);
     }
   };
 
-  // const handleShare = () => {
-  //   // Share functionality would go here
-  //   Alert.alert('Share', 'Share functionality would be implemented here');
-  // };
+  // Xử lý sự kiện vuốt lên
+  const handleTouchStart = (event: GestureResponderEvent) => {
+    setStartY(event.nativeEvent.pageY);
+  };
+
+  const handleTouchEnd = (event: GestureResponderEvent) => {
+    const endY = event.nativeEvent.pageY;
+    const deltaY = startY - endY;
+    
+    // Nếu vuốt lên (deltaY > 0) và khoảng cách đủ lớn (> 50)
+    if (deltaY > 50) {
+      handleNextQuote();
+    }
+  };
+
+  // Xác định nguồn hình ảnh cho nút yêu thích
+  const favoriteIconSource = isFavorite 
+    ? require('../../assets/icons/heart-active.png')
+    : require('../../assets/icons/heart-inactive.png');
 
   return (
-    <View style={styles.container}>
+    <View 
+      style={styles.container}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={isDarkMode ? '#1a1a1a' : '#ffffff'}
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent={true}
       />
-      {/* eslint-disable-next-line react-native/no-inline-styles */}
-      <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' }]}>
-        <LinearGradient
-          colors={gradientColors}
-          style={styles.gradientBackground}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-        >
-          {/* Quote Card */}
-          <View style={styles.quoteCard}>
-            {/* Header with Category Badge */}
-            <View style={styles.header}>
-              <View style={styles.categoryBadge}>
-                <Text style={styles.categoryIcon}>{categoryAsset.emoji}</Text>
-                <Text style={styles.categoryName}>{safeQuote.category}</Text>
-              </View>
-              {/* <TouchableOpacity onPress={handleShare}>
-                <Text style={styles.shareIcon}>📤</Text>
-              </TouchableOpacity> */}
-            </View>
-
-            {/* Quote Content */}
-            <View style={styles.quoteContent}>
-              <Text style={styles.quoteText}>
-                {safeQuote.text}
-              </Text>
-            </View>
-
-            {/* Favorite Button (Inside Circle) */}
-            <View style={styles.favoriteContainer}>
-              <View style={styles.favoriteBackground} />
-              <TouchableOpacity style={styles.favoriteButton} onPress={toggleFavorite}>
-                <Text style={[styles.favoriteIcon, isFavorite && styles.favoriteIconActive]}>
-                  {isFavorite ? categoryAsset.activeIcon : categoryAsset.icon}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Next Button */}
-            <TouchableOpacity style={styles.nextButton} onPress={handleNextQuote}>
-              <Text style={styles.nextButtonText}>Next</Text>
+      <ImageBackground 
+        source={backgroundImage}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <SafeAreaView style={styles.safeAreaContainer}>
+          {/* Favorite Button */}
+          <View style={styles.favoriteButtonContainer}>
+            <TouchableOpacity 
+              style={styles.favoriteIconButton} 
+              onPress={toggleFavorite}
+            >
+              <Image 
+                source={favoriteIconSource}
+                style={[
+                  styles.favoriteIconImage, 
+                  isFavorite ? { tintColor: '#ff4c4c' } : { tintColor: '#fff' }
+                ]} 
+                key={`favorite-${isFavorite}`}
+              />
             </TouchableOpacity>
           </View>
-        </LinearGradient>
-      </SafeAreaView>
+
+          {/* Quote Content */}
+          <View style={styles.quoteContainer}>
+            <Text style={styles.quoteText}>{safeQuote.text}</Text>
+          </View>
+
+          {/* Bottom Tab Bar Placeholder */}
+          <View style={styles.tabBarPlaceholder}>
+            <TouchableOpacity style={styles.tabButton} onPress={handleNextQuote}>
+              <Text style={styles.tabButtonText}>General</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </ImageBackground>
     </View>
   );
 };

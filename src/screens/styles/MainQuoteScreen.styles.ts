@@ -3,7 +3,6 @@ import { lightColors, darkColors } from '../../theme/colors';
 
 // Lấy kích thước màn hình để tính toán layout tốt hơn
 const { width } = Dimensions.get('window');
-const cardWidth = width * 0.9;
 
 export const createStyles = (isDarkMode: boolean) => {
   const colors = isDarkMode ? darkColors : lightColors;
@@ -12,6 +11,157 @@ export const createStyles = (isDarkMode: boolean) => {
     container: {
       flex: 1,
     },
+    backgroundImage: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+    },
+    safeAreaContainer: {
+      flex: 1,
+      paddingTop: 40, // For status bar
+    },
+    favoriteButtonContainer: {
+      position: 'absolute',
+      top:80,
+      right: 20,
+      zIndex: 10,
+    },
+    favoriteIconButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    favoriteIconImage: {
+      width: 24,
+      height: 24,
+      tintColor: '#fff',
+    },
+    topBar: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      marginTop: 10,
+    },
+    heartButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    heartIcon: {
+      width: 28,
+      height: 28,
+      tintColor: '#fff',
+    },
+    progressContainer: {
+      flex: 1,
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginHorizontal: 15,
+    },
+    progressText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: 5,
+    },
+    progressBar: {
+      width: '100%',
+      height: 4,
+      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+      borderRadius: 2,
+    },
+    progressFill: {
+      height: '100%',
+      backgroundColor: '#fff',
+      borderRadius: 2,
+    },
+    crownButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    crownIcon: {
+      width: 28,
+      height: 28,
+      tintColor: '#fff',
+    },
+    quoteContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 30,
+    },
+    quoteText: {
+      fontSize: 36,
+      color: '#fff',
+      textAlign: 'center',
+      fontWeight: '500',
+      lineHeight: 46,
+      fontFamily: 'Georgia',
+      textShadowColor: 'rgba(0, 0, 0, 0.5)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 5,
+    },
+    bottomBar: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingBottom: 20,
+      marginBottom: 80, // Space for tab bar
+    },
+    shareButton: {
+      width: 50,
+      height: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      borderRadius: 25,
+      marginHorizontal: 10,
+    },
+    shareIcon: {
+      width: 24,
+      height: 24,
+      tintColor: '#fff',
+    },
+    favoriteButton: {
+      width: 50,
+      height: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      borderRadius: 25,
+      marginHorizontal: 10,
+    },
+    favoriteIcon: {
+      width: 24,
+      height: 24,
+      tintColor: '#fff',
+    },
+    tabBarPlaceholder: {
+      position: 'absolute',
+      bottom: 30,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+    },
+    tabButton: {
+      backgroundColor: '#fff',
+      paddingVertical: 12,
+      paddingHorizontal: 30,
+      borderRadius: 25,
+    },
+    tabButtonText: {
+      color: '#333',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    // Giữ lại các style cũ cho khả năng tương thích
     gradientBackground: {
       flex: 1,
       justifyContent: 'center',
@@ -19,7 +169,7 @@ export const createStyles = (isDarkMode: boolean) => {
       backgroundColor: colors.backgroundSecondary,
     },
     quoteCard: {
-      width: cardWidth,
+      width: width * 0.9,
       backgroundColor: isDarkMode ? '#2A2A2A' : colors.background,
       borderRadius: 25,
       padding: 25,
@@ -58,58 +208,6 @@ export const createStyles = (isDarkMode: boolean) => {
       fontSize: 14,
       color: isDarkMode ? '#FFFFFF' : colors.text,
       fontWeight: '600',
-    },
-    shareIcon: {
-      fontSize: 24,
-    },
-    quoteContent: {
-      minHeight: 150,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: 30,
-    },
-    quoteText: {
-      fontSize: 20,
-      color: isDarkMode ? '#FFFFFF' : colors.text,
-      textAlign: 'center',
-      lineHeight: 32,
-      fontWeight: '500',
-    },
-    favoriteContainer: {
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    favoriteBackground: {
-      position: 'absolute',
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: isDarkMode ? '#3A3A3A' : colors.background,
-      shadowColor: isDarkMode ? '#000' : colors.text,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: isDarkMode ? 0.5 : 0.1,
-      shadowRadius: 4,
-      elevation: isDarkMode ? 6 : 3,
-      borderWidth: 1,
-      borderColor: isDarkMode ? '#4A4A4A' : colors.border,
-    },
-    favoriteButton: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'transparent',
-    },
-    favoriteIcon: {
-      fontSize: 24,
-      opacity: isDarkMode ? 0.8 : 0.6,
-    },
-    favoriteIconActive: {
-      opacity: 1,
     },
     nextButton: {
       backgroundColor: colors.primary,

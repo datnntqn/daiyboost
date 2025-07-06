@@ -12,7 +12,7 @@ import NotificationSettingsScreen from './src/screens/NotificationSettingsScreen
 import FavoriteQuotesScreen from './src/screens/FavoriteQuotesScreen';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { useTheme } from './src/context/ThemeContext';
-import { createTabBarStyles } from './src/screens/styles/TabBar.styles';
+import CustomTabBar from './src/components/CustomTabBar';
 import { lightColors, darkColors } from './src/theme/colors';
 import { RootStackParamList } from './src/types/navigation';
 
@@ -51,55 +51,51 @@ function SettingsStackScreen() {
   );
 }
 
-const getTabBarIcon = (route: string, focused: boolean) => {
-  let icon;
-  if (route === 'MainQuote') {
-    icon = focused 
-      ? require('./assets/icons/quote-active.png')
-      : require('./assets/icons/quote-inactive.png');
-  } else if (route === 'CategoriesStack') {
-    icon = focused 
-      ? require('./assets/icons/category-active.png')
-      : require('./assets/icons/category-inactive.png');
-  } else if (route === 'Favorites') {
-    icon = focused 
-      ? require('./assets/icons/heart-active.png')
-      : require('./assets/icons/heart-inactive.png');
-  } else if (route === 'Settings') {
-    icon = focused 
-      ? require('./assets/icons/settings-active.png')
-      : require('./assets/icons/settings-inactive.png');
-  }
-
-  return (
-    <Image
-      source={icon}
-      style={{
-        width: 24,
-        height: 24,
-        marginTop: 4,
-        opacity: focused ? 1 : 0.8,
-      }}
-      resizeMode="contain"
-    />
-  );
-};
-
 const NavigationWrapper = () => {
   const { isDarkMode } = useTheme();
-  const tabBarStyles = createTabBarStyles(isDarkMode);
   const colors = isDarkMode ? darkColors : lightColors;
+
+  const getTabBarIcon = (route: string, focused: boolean) => {
+    let icon;
+    if (route === 'MainQuote') {
+      icon = focused 
+        ? require('./assets/icons/quote-active.png')
+        : require('./assets/icons/quote-inactive.png');
+    } else if (route === 'CategoriesStack') {
+      icon = focused 
+        ? require('./assets/icons/category-active.png')
+        : require('./assets/icons/category-inactive.png');
+    } else if (route === 'Favorites') {
+      icon = focused 
+        ? require('./assets/icons/heart-active.png')
+        : require('./assets/icons/heart-inactive.png');
+    } else if (route === 'Settings') {
+      icon = focused 
+        ? require('./assets/icons/settings-active.png')
+        : require('./assets/icons/settings-inactive.png');
+    }
+
+    return (
+      <Image
+        source={icon}
+        style={{
+          width: 24,
+          height: 24,
+          tintColor: focused ? colors.primary : colors.textSecondary,
+        }}
+        resizeMode="contain"
+      />
+    );
+  };
 
   return (
     <Tab.Navigator
-      initialRouteName="MainQuote"
+      tabBar={props => <CustomTabBar {...props} />}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused }) => getTabBarIcon(route.name, focused),
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarShowLabel: true,
-        tabBarLabelStyle: tabBarStyles.tabBarLabel,
-        tabBarStyle: tabBarStyles.tabBar,
       })}
     >
       <Tab.Screen 
