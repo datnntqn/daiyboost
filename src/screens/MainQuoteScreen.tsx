@@ -11,10 +11,9 @@ import {
   GestureResponderEvent
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { quotes } from '../data/quotes';
+import { quotes, getBackgroundImage, CategoryKey, Quote } from '../data/quotes';
 import { createStyles } from './styles/MainQuoteScreen.styles';
 import { useTheme } from '../context/ThemeContext';
-import { Quote, CategoryType } from '../types/quote';
 import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 
@@ -38,7 +37,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     return quotes && quotes.length > 0 ? quotes[currentQuoteIndex % quotes.length] : {
       id: '0',
       text: 'Be kind to yourself every day.',
-      category: 'Self-Love' as CategoryType
+      category: 'Self-Love' as CategoryKey
     };
   }, [currentQuoteIndex]);
 
@@ -68,7 +67,10 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     }
   };
 
-  const backgroundImage = require('../../assets/beach.jpg');
+  // Lấy background image dựa trên category
+  const backgroundImage = useMemo(() => {
+    return getBackgroundImage(safeQuote.category);
+  }, [safeQuote.category]);
 
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);

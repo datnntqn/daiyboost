@@ -144,26 +144,21 @@ export const getBackgroundImage = (category: CategoryKey | string): any => {
   }
   
   const categoryKey = category as CategoryKey;
-  const path = categoryData[categoryKey]?.backgroundPath;
-  
-  if (!path) {
-    return require('../../assets/main_quote_background.png');
-  }
   
   try {
-    switch (path) {
-      case 'happiness_bg':
-        return require('../../assets/backgrounds/happiness_bg.png');
-      case 'productivity_bg':
-        return require('../../assets/backgrounds/productivity_bg.png');
-      case 'self_love_bg':
-        return require('../../assets/backgrounds/self_love_bg.png');
-      case 'inspiration_bg':
-        return require('../../assets/backgrounds/inspiration_bg.png');
-      case 'success_bg':
-        return require('../../assets/backgrounds/success_bg.png');
-      case 'mindfulness_bg':
-        return require('../../assets/backgrounds/mindfulness_bg.png');
+    switch (categoryKey) {
+      case 'Happiness':
+        return require('../../assets/backgrounds/happiness.jpg');
+      case 'Productivity':
+        return require('../../assets/backgrounds/productivity.jpg');
+      case 'Self-Love':
+        return require('../../assets/backgrounds/self_love.jpg');
+      case 'Inspiration':
+        return require('../../assets/backgrounds/inspiration.jpg');
+      case 'Success':
+        return require('../../assets/backgrounds/success.jpg');
+      case 'Mindfulness':
+        return require('../../assets/backgrounds/mindfulness.jpg');
       default:
         return require('../../assets/main_quote_background.png');
     }
