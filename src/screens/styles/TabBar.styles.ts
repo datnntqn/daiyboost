@@ -3,7 +3,7 @@ import { lightColors, darkColors } from '../../theme/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const TAB_BAR_WIDTH = SCREEN_WIDTH - 40; // 20px padding on each side
-const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 85 : 65;
+const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 70 : 65;
 const BOTTOM_INSET = Platform.OS === 'ios' ? 24 : 16;
 
 export const createTabBarStyles = (isDarkMode: boolean) => {
@@ -48,7 +48,7 @@ export const createTabBarStyles = (isDarkMode: boolean) => {
       alignItems: 'center',
       justifyContent: 'space-around',
       paddingTop: Platform.OS === 'ios' ? 12 : 8,
-      paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+      paddingBottom: Platform.OS === 'ios' ? 12 : 8,
     },
     tabButton: {
       flex: 1,
