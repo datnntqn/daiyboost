@@ -30,6 +30,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
   const [_totalFavorites, setTotalFavorites] = useState(0);
   const [startY, setStartY] = useState(0);
+  const [_forceUpdate, _setForceUpdate] = useState(0);
   const viewShotRef = useRef<ViewShot>(null);
 
   // Đảm bảo có dữ liệu hợp lệ với useMemo
@@ -72,12 +73,19 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     return getBackgroundImage(safeQuote.category);
   }, [safeQuote.category]);
 
+// const backgroundImage = require('../../assets/backgrounds/success.jpg');
+
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
   };
 
   const toggleFavorite = async () => {
     try {
+      console.log('Before toggle - isFavorite:', isFavorite);
+      
+      // Cập nhật state ngay lập tức để UI thay đổi
+      setIsFavorite(!isFavorite);
+      
       let updatedFavorites: Quote[];
       if (isFavorite) {
         updatedFavorites = favoriteQuotes.filter(quote => quote.id !== safeQuote.id);
@@ -85,10 +93,12 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
         updatedFavorites = [...favoriteQuotes, safeQuote];
       }
       
+      // Lưu vào AsyncStorage
       await AsyncStorage.setItem('favorite_quotes', JSON.stringify(updatedFavorites));
       setFavoriteQuotes(updatedFavorites);
       setTotalFavorites(updatedFavorites.length);
-      setIsFavorite(!isFavorite);
+      
+      console.log('After toggle - isFavorite set to:', !isFavorite);
     } catch (error) {
       console.error('Error updating favorite quotes:', error);
     }
@@ -145,6 +155,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
             <TouchableOpacity
               style={styles.shareButtonContainer}
               onPress={handleShare}
+              activeOpacity={0.6}
             >
               <View style={styles.actionButton}>
                 <Image
@@ -157,12 +168,25 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
             <TouchableOpacity
               style={styles.favoriteButtonContainer}
               onPress={toggleFavorite}
+              activeOpacity={0.6}
             >
-              <View style={styles.actionButton}>
-                <Image
-                  source={isFavorite ? require('../../assets/icons/heart-active.png') : require('../../assets/icons/heart-inactive.png')}
-                  style={styles.actionButtonIcon}
-                />
+              <View style={[styles.actionButton]}>
+                {(() => {
+                  const iconSource = isFavorite 
+                    ? require('../../assets/icons/heart-active.png') 
+                    : require('../../assets/icons/heart-inactive.png');
+                  
+                  return (
+                    <Image
+                      source={iconSource}
+                      style={[
+                        styles.actionButtonIcon,
+                        isFavorite ? { tintColor: '#ff4c4c' } : { tintColor: '#fff' }
+                      ]}
+                      key={`favorite-${isFavorite}`}
+                    />
+                  );
+                })()}
               </View>
             </TouchableOpacity>
 

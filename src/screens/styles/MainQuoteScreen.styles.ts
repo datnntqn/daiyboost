@@ -99,7 +99,7 @@ export const createStyles = (isDarkMode: boolean) => {
       paddingHorizontal: 30,
     },
     quoteText: {
-      fontSize: 36,
+      fontSize: 30,
       color: '#fff',
       textAlign: 'center',
       fontWeight: '500',
