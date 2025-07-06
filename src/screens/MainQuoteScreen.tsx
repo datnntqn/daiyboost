@@ -49,22 +49,66 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
 
   useEffect(() => {
     loadFavoriteQuotes();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Chỉ chạy một lần khi component mount
 
   useEffect(() => {
     checkIfFavorite();
   }, [checkIfFavorite, safeQuote.id]);
 
+  // Cập nhật trạng thái yêu thích khi quote thay đổi
+  useEffect(() => {
+    if (favoriteQuotes.length > 0) {
+      const isCurrentQuoteFavorite = favoriteQuotes.some(quote => quote.id === safeQuote.id);
+      if (isCurrentQuoteFavorite !== isFavorite) {
+        setIsFavorite(isCurrentQuoteFavorite);
+        console.log('Updating favorite status for new quote:', isCurrentQuoteFavorite);
+      }
+    }
+  }, [safeQuote.id, favoriteQuotes, isFavorite]);
+
   const loadFavoriteQuotes = async () => {
     try {
+      console.log('Loading favorite quotes from AsyncStorage...');
       const savedQuotes = await AsyncStorage.getItem('favorite_quotes');
+      
       if (savedQuotes) {
-        const parsedQuotes = JSON.parse(savedQuotes);
-        setFavoriteQuotes(parsedQuotes);
-        setTotalFavorites(parsedQuotes.length);
+        try {
+          const parsedQuotes = JSON.parse(savedQuotes);
+          
+          // Đảm bảo dữ liệu đọc được là một mảng
+          if (Array.isArray(parsedQuotes)) {
+            console.log('Loaded favorites successfully. Count:', parsedQuotes.length);
+            setFavoriteQuotes(parsedQuotes);
+            setTotalFavorites(parsedQuotes.length);
+            
+            // Kiểm tra xem quote hiện tại có trong danh sách yêu thích không
+            const isCurrentQuoteFavorite = parsedQuotes.some(quote => quote.id === safeQuote.id);
+            setIsFavorite(isCurrentQuoteFavorite);
+            console.log('Current quote favorite status:', isCurrentQuoteFavorite);
+          } else {
+            console.warn('Saved favorites is not an array, resetting to empty array');
+            setFavoriteQuotes([]);
+            setTotalFavorites(0);
+            setIsFavorite(false);
+          }
+        } catch (parseError) {
+          console.error('Error parsing favorite quotes:', parseError);
+          setFavoriteQuotes([]);
+          setTotalFavorites(0);
+          setIsFavorite(false);
+        }
+      } else {
+        console.log('No saved favorites found');
+        setFavoriteQuotes([]);
+        setTotalFavorites(0);
+        setIsFavorite(false);
       }
     } catch (error) {
       console.error('Error loading favorite quotes:', error);
+      setFavoriteQuotes([]);
+      setTotalFavorites(0);
+      setIsFavorite(false);
     }
   };
 
@@ -86,21 +130,54 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
       // Cập nhật state ngay lập tức để UI thay đổi
       setIsFavorite(!isFavorite);
       
+      // Lấy danh sách favorites hiện tại từ AsyncStorage
+      const savedQuotesStr = await AsyncStorage.getItem('favorite_quotes');
+      let currentFavorites: Quote[] = [];
+      
+      if (savedQuotesStr) {
+        try {
+          currentFavorites = JSON.parse(savedQuotesStr);
+          // Đảm bảo dữ liệu đọc được là một mảng
+          if (!Array.isArray(currentFavorites)) {
+            currentFavorites = [];
+          }
+        } catch (parseError) {
+          console.error('Error parsing favorites:', parseError);
+          currentFavorites = [];
+        }
+      }
+      
       let updatedFavorites: Quote[];
+      
       if (isFavorite) {
-        updatedFavorites = favoriteQuotes.filter(quote => quote.id !== safeQuote.id);
+        // Xóa khỏi danh sách yêu thích
+        console.log('Removing from favorites:', safeQuote.id);
+        updatedFavorites = currentFavorites.filter(quote => quote.id !== safeQuote.id);
       } else {
-        updatedFavorites = [...favoriteQuotes, safeQuote];
+        // Thêm vào danh sách yêu thích
+        console.log('Adding to favorites:', safeQuote.id);
+        // Kiểm tra xem quote đã tồn tại trong danh sách chưa
+        const quoteExists = currentFavorites.some(quote => quote.id === safeQuote.id);
+        if (!quoteExists) {
+          updatedFavorites = [...currentFavorites, safeQuote];
+        } else {
+          updatedFavorites = currentFavorites;
+        }
       }
       
       // Lưu vào AsyncStorage
       await AsyncStorage.setItem('favorite_quotes', JSON.stringify(updatedFavorites));
+      console.log('Saved to AsyncStorage. Total favorites:', updatedFavorites.length);
+      
+      // Cập nhật state
       setFavoriteQuotes(updatedFavorites);
       setTotalFavorites(updatedFavorites.length);
       
       console.log('After toggle - isFavorite set to:', !isFavorite);
     } catch (error) {
       console.error('Error updating favorite quotes:', error);
+      // Revert UI state if there was an error
+      setIsFavorite(isFavorite);
     }
   };
 
