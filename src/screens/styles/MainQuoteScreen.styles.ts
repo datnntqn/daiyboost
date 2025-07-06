@@ -3,6 +3,7 @@ import { lightColors, darkColors } from '../../theme/colors';
 
 // Lấy kích thước màn hình để tính toán layout tốt hơn
 const { width } = Dimensions.get('window');
+const ScreenHeight = Dimensions.get('window').height;
 
 export const createStyles = (isDarkMode: boolean) => {
   const colors = isDarkMode ? darkColors : lightColors;
@@ -93,8 +94,8 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     quoteContainer: {
       flex: 1,
-      justifyContent: 'center',
       alignItems: 'center',
+      paddingTop: ScreenHeight * 0.2,
       paddingHorizontal: 30,
     },
     quoteText: {
