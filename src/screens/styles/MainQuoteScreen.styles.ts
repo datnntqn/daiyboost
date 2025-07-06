@@ -336,6 +336,25 @@ export const createStyles = (isDarkMode: boolean) => {
       color: '#466995',
       fontWeight: 'bold',
     },
+    shareButtonContainer: {
+      position: 'absolute',
+      top: 80,
+      left: 20,
+      zIndex: 10,
+    },
+    actionButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    actionButtonIcon: {
+      width: 24,
+      height: 24,
+      tintColor: '#fff',
+    },
   });
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -15,6 +15,8 @@ import { quotes } from '../data/quotes';
 import { createStyles } from './styles/MainQuoteScreen.styles';
 import { useTheme } from '../context/ThemeContext';
 import { Quote, CategoryType } from '../types/quote';
+import ViewShot from 'react-native-view-shot';
+import Share from 'react-native-share';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -29,6 +31,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
   const [_totalFavorites, setTotalFavorites] = useState(0);
   const [startY, setStartY] = useState(0);
+  const viewShotRef = useRef<ViewShot>(null);
 
   // Đảm bảo có dữ liệu hợp lệ với useMemo
   const safeQuote = useMemo(() => {
@@ -104,10 +107,20 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     }
   };
 
-  // Xác định nguồn hình ảnh cho nút yêu thích
-  const favoriteIconSource = isFavorite 
-    ? require('../../assets/icons/heart-active.png')
-    : require('../../assets/icons/heart-inactive.png');
+  const handleShare = async () => {
+    try {
+      if (viewShotRef.current?.capture) {
+        const uri = await viewShotRef.current.capture();
+        await Share.open({
+          url: uri,
+          title: 'Share Quote',
+          message: 'Check out this inspiring quote!',
+        });
+      }
+    } catch (error) {
+      console.log('Error sharing:', error);
+    }
+  };
 
   return (
     <View 
@@ -120,42 +133,45 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
         backgroundColor="transparent"
         translucent={true}
       />
-      <ImageBackground 
-        source={backgroundImage}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        <SafeAreaView style={styles.safeAreaContainer}>
-          {/* Favorite Button */}
-          <View style={styles.favoriteButtonContainer}>
-            <TouchableOpacity 
-              style={styles.favoriteIconButton} 
+      <ViewShot ref={viewShotRef} style={styles.container}>
+        <ImageBackground 
+          source={backgroundImage}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        >
+          <SafeAreaView style={styles.safeAreaContainer}>
+            <TouchableOpacity
+              style={styles.shareButtonContainer}
+              onPress={handleShare}
+            >
+              <View style={styles.actionButton}>
+                <Image
+                  source={require('../../assets/icons/share.png')}
+                  style={styles.actionButtonIcon}
+                />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.favoriteButtonContainer}
               onPress={toggleFavorite}
             >
-              <Image 
-                source={favoriteIconSource}
-                style={[
-                  styles.favoriteIconImage, 
-                  isFavorite ? { tintColor: '#ff4c4c' } : { tintColor: '#fff' }
-                ]} 
-                key={`favorite-${isFavorite}`}
-              />
+              <View style={styles.actionButton}>
+                <Image
+                  source={isFavorite ? require('../../assets/icons/heart-active.png') : require('../../assets/icons/heart-inactive.png')}
+                  style={styles.actionButtonIcon}
+                />
+              </View>
             </TouchableOpacity>
-          </View>
 
-          {/* Quote Content */}
-          <View style={styles.quoteContainer}>
-            <Text style={styles.quoteText}>{safeQuote.text}</Text>
-          </View>
+            {/* Quote Content */}
+            <View style={styles.quoteContainer}>
+              <Text style={styles.quoteText}>{safeQuote.text}</Text>
+            </View>
 
-          {/* Bottom Tab Bar Placeholder */}
-          <View style={styles.tabBarPlaceholder}>
-            <TouchableOpacity style={styles.tabButton} onPress={handleNextQuote}>
-              <Text style={styles.tabButtonText}>General</Text>
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </ImageBackground>
+          </SafeAreaView>
+        </ImageBackground>
+      </ViewShot>
     </View>
   );
 };
