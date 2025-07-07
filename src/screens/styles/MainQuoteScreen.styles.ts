@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { lightColors, darkColors } from '../../theme/colors';
+import { fonts, fontSizes, fontWeights } from '../../theme/fonts';
 
 // Lấy kích thước màn hình để tính toán layout tốt hơn
 const { width } = Dimensions.get('window');
@@ -99,12 +100,12 @@ export const createStyles = (isDarkMode: boolean) => {
       paddingHorizontal: 30,
     },
     quoteText: {
-      fontSize: 30,
+      fontSize: fontSizes.xxlarge,
       color: '#fff',
       textAlign: 'center',
-      fontWeight: '500',
+      fontWeight: fontWeights.medium,
       lineHeight: 46,
-      fontFamily: 'Georgia',
+      fontFamily: fonts.playfairDisplayBold,
       textShadowColor: 'rgba(0, 0, 0, 0.5)',
       textShadowOffset: { width: 1, height: 1 },
       textShadowRadius: 5,
