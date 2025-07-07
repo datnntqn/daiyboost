@@ -46,7 +46,7 @@ export const createStyles = (isDarkMode: boolean) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: 20,
-      marginTop: 10,
+      marginTop: 20,
     },
     heartButton: {
       width: 40,
@@ -95,8 +95,8 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     quoteContainer: {
       flex: 1,
+      paddingTop: ScreenHeight * 0.1,
       alignItems: 'center',
-      paddingTop: ScreenHeight * 0.2,
       paddingHorizontal: 30,
     },
     quoteText: {
@@ -106,16 +106,28 @@ export const createStyles = (isDarkMode: boolean) => {
       fontWeight: fontWeights.medium,
       lineHeight: 46,
       fontFamily: fonts.playfairDisplayBold,
-      textShadowColor: 'rgba(0, 0, 0, 0.5)',
-      textShadowOffset: { width: 1, height: 1 },
-      textShadowRadius: 5,
+      textShadowColor: 'rgba(0, 0, 0, 0.75)',
+      textShadowOffset: { width: 2, height: 2 },
+      textShadowRadius: 10,
+      letterSpacing: 0.5,
     },
     bottomBar: {
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      paddingBottom: 20,
-      marginBottom: 80, // Space for tab bar
+      paddingBottom: 40,
+      paddingHorizontal: 20,
+    },
+    categoryText: {
+      color: '#fff',
+      fontSize: fontSizes.large,
+      fontWeight: fontWeights.medium,
+      textAlign: 'center',
+      textShadowColor: 'rgba(0, 0, 0, 0.75)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 5,
+      letterSpacing: 0.5,
+      opacity: 0.9,
     },
     shareButton: {
       width: 50,
@@ -355,6 +367,14 @@ export const createStyles = (isDarkMode: boolean) => {
       width: 24,
       height: 24,
       tintColor: '#fff',
+    },
+    gradientOverlay: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: 'transparent',
     },
   });
 };

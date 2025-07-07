@@ -8,7 +8,7 @@ import {
   LogBox, 
   ImageBackground,
   Image,
-  GestureResponderEvent
+  GestureResponderEvent,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { quotes, getBackgroundImage, CategoryKey, Quote } from '../data/quotes';
@@ -16,6 +16,7 @@ import { createStyles } from './styles/MainQuoteScreen.styles';
 import { useTheme } from '../context/ThemeContext';
 import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
+import LinearGradient from 'react-native-linear-gradient';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -228,50 +229,47 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
           style={styles.backgroundImage}
           resizeMode="cover"
         >
+          <LinearGradient
+            colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.6)']}
+            style={styles.gradientOverlay}
+          />
+          
           <SafeAreaView style={styles.safeAreaContainer}>
-            <TouchableOpacity
-              style={styles.shareButtonContainer}
-              onPress={handleShare}
-              activeOpacity={0.6}
-            >
-              <View style={styles.actionButton}>
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleShare}
+                activeOpacity={0.6}
+              >
                 <Image
                   source={require('../../assets/icons/share.png')}
                   style={styles.actionButtonIcon}
                 />
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.favoriteButtonContainer}
-              onPress={toggleFavorite}
-              activeOpacity={0.6}
-            >
-              <View style={[styles.actionButton]}>
-                {(() => {
-                  const iconSource = isFavorite 
-                    ? require('../../assets/icons/heart-active.png') 
-                    : require('../../assets/icons/heart-inactive.png');
-                  
-                  return (
-                    <Image
-                      source={iconSource}
-                      style={[
-                        styles.actionButtonIcon,
-                        isFavorite ? { tintColor: '#ff4c4c' } : { tintColor: '#fff' }
-                      ]}
-                      key={`favorite-${isFavorite}`}
-                    />
-                  );
-                })()}
-              </View>
-            </TouchableOpacity>
-
-            {/* Quote Content */}
-            <View style={styles.quoteContainer}>
-              <Text style={styles.quoteText}>{safeQuote.text}</Text>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={toggleFavorite}
+                activeOpacity={0.6}
+              >
+                <Image
+                  source={isFavorite ? require('../../assets/icons/heart-active.png') : require('../../assets/icons/heart-inactive.png')}
+                  style={styles.actionButtonIcon}
+                />
+              </TouchableOpacity>
             </View>
 
+            <View style={styles.quoteContainer}>
+              <Text style={styles.quoteText}>
+                {safeQuote.text}
+              </Text>
+            </View>
+
+            <View style={styles.bottomBar}>
+              <Text style={styles.categoryText}>
+                {safeQuote.category}
+              </Text>
+            </View>
           </SafeAreaView>
         </ImageBackground>
       </ViewShot>
