@@ -8,13 +8,17 @@ import {
   StatusBar,
   ImageBackground,
   StyleSheet,
+  Animated,
+  Share,
+  Image,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import { createStyles } from './styles/CategoryScreen.styles';
 import { quotes } from '../data/quotes';
-import { Quote } from '../types/Quote';
+import { Quote } from '../data/quotes';
+import { CategoryType } from '../types/categories';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { categoryAssets } from '../constants/categoryAssets';
@@ -34,6 +38,7 @@ const CategoryScreen = () => {
   const { isDarkMode } = useTheme();
   const styles = createStyles(isDarkMode) as CategoryScreenStyles;
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
+  const [scaleAnim] = useState(new Animated.Value(1));
 
   const loadFavoriteQuotes = async () => {
     try {
@@ -69,10 +74,28 @@ const CategoryScreen = () => {
 
   const { category } = route.params;
   const categoryAsset = categoryAssets[category] || categoryAssets.default;
-  const categoryQuotes = quotes.filter(quote => quote.category === category);
+  // Convert category name to match the CategoryType format
+  const normalizedCategory = category.toLowerCase().replace(/-/g, '_') as CategoryType;
+  const categoryQuotes = quotes.filter(quote => quote.category.toLowerCase().replace(/-/g, '_') === normalizedCategory);
+
+  const animatePress = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   const toggleFavorite = async (quote: Quote) => {
     try {
+      animatePress();
       const isFavorite = favoriteQuotes.some(q => q.id === quote.id);
       let updatedFavorites: Quote[];
 
@@ -89,21 +112,60 @@ const CategoryScreen = () => {
     }
   };
 
+  const handleShare = async (quote: Quote) => {
+    try {
+      await Share.share({
+        message: `"${quote.text}" - ${quote.author}`,
+      });
+    } catch (error) {
+      console.error('Error sharing quote:', error);
+    }
+  };
+
   const renderQuoteItem = ({ item }: { item: Quote }) => {
     const isFavorite = favoriteQuotes.some(quote => quote.id === item.id);
     
     return (
-      <View style={styles.quoteCard}>
+      <Animated.View 
+        style={[
+          styles.quoteCard,
+          {
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
         <Text style={styles.quoteText}>{item.text}</Text>
-        <TouchableOpacity
-          style={styles.favoriteButton}
-          onPress={() => toggleFavorite(item)}
-        >
-          <Text style={styles.favoriteIcon}>
-            {isFavorite ? '❤️' : '🤍'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.actionBar}>
+          <View style={styles.leftActions}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => toggleFavorite(item)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.actionIcon}>
+                {isFavorite ? '❤️' : '🤍'}
+              </Text>
+              <Text style={styles.actionButtonText}>
+                {isFavorite ? 'Liked' : 'Like'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.rightActions}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => handleShare(item)}
+              activeOpacity={0.7}
+            >
+              <Image
+                source={require('../../assets/icons/share.png')}
+                // @ts-ignore
+                style={styles.actionButtonIcon}
+              />
+              {/* <Text style={styles.actionButtonText}>Share</Text> */}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
     );
   };
 
@@ -116,8 +178,8 @@ const CategoryScreen = () => {
       >
         <LinearGradient
           colors={isDarkMode 
-            ? ['rgba(26, 26, 26, 0.9)', 'rgba(26, 26, 26, 0.7)']
-            : ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.7)']}
+            ? ['rgba(26, 26, 26, 0.92)', 'rgba(26, 26, 26, 0.85)']
+            : ['rgba(255, 255, 255, 0.92)', 'rgba(255, 255, 255, 0.85)']}
           style={styles.gradientOverlay}
         />
         <SafeAreaView style={styles.contentContainer}>
@@ -131,9 +193,9 @@ const CategoryScreen = () => {
             <TouchableOpacity
               style={styles.backButton}
               onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
             >
               <Text style={styles.backButtonText}>←</Text>
-              <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
             
             <Text style={styles.headerTitle}>
