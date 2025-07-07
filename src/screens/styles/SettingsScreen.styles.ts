@@ -1,126 +1,146 @@
-import { StyleSheet } from 'react-native';
-import { lightColors, darkColors } from '../../theme/colors';
+import { StyleSheet, Platform, Dimensions } from 'react-native';
+import { colors } from '../../theme/colors';
 
-export const createStyles = (isDarkMode: boolean) => {
-  const colors = isDarkMode ? darkColors : lightColors;
+const { width } = Dimensions.get('window');
 
-  return StyleSheet.create({
+export const createStyles = (isDarkMode: boolean) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: isDarkMode ? 
+        'rgba(0, 0, 0, 0.95)' : 
+        'rgba(242, 242, 247, 0.95)',
+    },
     container: {
       flex: 1,
-      backgroundColor: colors.backgroundSecondary,
-      paddingHorizontal: 20,
-      paddingTop: 60,
+      backgroundColor: isDarkMode ? 
+        'rgba(0, 0, 0, 0.95)' : 
+        'rgba(242, 242, 247, 0.95)',
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 40,
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+      backgroundColor: 'transparent',
+      marginBottom: 8,
     },
     backButton: {
-      marginRight: 20,
-      padding: 5,
-    },
-    backIcon: {
-      fontSize: 20,
-      color: colors.text,
+      width: 32,
+      height: 32,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 16,
+      marginRight: 12,
+      backgroundColor: isDarkMode ? 
+        'rgba(255, 255, 255, 0.1)' : 
+        'rgba(0, 0, 0, 0.05)',
     },
     title: {
       fontSize: 32,
-      fontWeight: 'bold',
-      color: colors.text,
-      flex: 1,
+      fontWeight: Platform.OS === 'ios' ? '700' : '700',
+      color: isDarkMode ? colors.darkText : colors.lightText,
+      letterSpacing: 0.35,
+    },
+    section: {
+      marginTop: 32,
+      width: width,
     },
     sectionTitle: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      marginTop: 30,
-      marginBottom: 15,
-      marginLeft: 5,
+      fontSize: 13,
       fontWeight: '500',
-      textTransform: 'uppercase',
+      marginBottom: 8,
+      paddingHorizontal: 16,
+      color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
       letterSpacing: 0.5,
+      textTransform: 'uppercase',
+    },
+    sectionBackground: {
+      backgroundColor: isDarkMode ? 
+        'rgba(255, 255, 255, 0.08)' : 
+        'rgba(255, 255, 255, 0.95)',
+      borderRadius: 12,
+      marginHorizontal: 16,
+      overflow: 'hidden',
     },
     settingItem: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: colors.cardBackground,
-      paddingVertical: 20,
-      paddingHorizontal: 20,
-      borderRadius: 15,
-      marginBottom: 15,
-      shadowColor: colors.text,
-      shadowOffset: {
-        width: 0,
-        height: 1,
-      },
-      shadowOpacity: isDarkMode ? 0.2 : 0.05,
-      shadowRadius: 2,
-      elevation: 2,
-      borderWidth: 1,
-      borderColor: colors.border,
+      justifyContent: 'space-between',
+      paddingVertical: 11,
+      paddingHorizontal: 16,
+      borderBottomWidth: 0.5,
+      borderBottomColor: isDarkMode ? 
+        'rgba(255, 255, 255, 0.1)' : 
+        'rgba(0, 0, 0, 0.1)',
+    },
+    lastSettingItem: {
+      borderBottomWidth: 0,
     },
     settingContent: {
       flexDirection: 'row',
       alignItems: 'center',
       flex: 1,
     },
-    settingIcon: {
-      fontSize: 18,
-      marginRight: 15,
-      width: 25,
-      textAlign: 'center',
+    icon: {
+      width: 20,
+      height: 20,
+      marginRight: 12,
+      tintColor: isDarkMode ? colors.darkText : colors.lightText,
+    },
+    chevronIcon: {
+      width: 16,
+      height: 16,
+      tintColor: isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)',
+      marginLeft: 8,
     },
     settingText: {
-      fontSize: 18,
-      color: colors.text,
-      fontWeight: '500',
+      fontSize: 17,
+      color: isDarkMode ? colors.darkText : colors.lightText,
+      fontWeight: '400',
       flex: 1,
     },
-    chevron: {
-      fontSize: 16,
-      color: colors.textSecondary,
-    },
-    themeToggleContainer: {
-      flexDirection: 'row',
-      backgroundColor: colors.backgroundSecondary,
-      borderRadius: 20,
-      padding: 3,
-    },
-    themeOption: {
-      paddingVertical: 8,
-      paddingHorizontal: 15,
-      borderRadius: 17,
-      minWidth: 60,
-      alignItems: 'center',
-    },
-    themeOptionSelected: {
-      backgroundColor: colors.primary,
-    },
-    themeOptionText: {
-      color: colors.textSecondary,
-      fontSize: 14,
-      fontWeight: '500',
-    },
-    themeOptionTextSelected: {
-      color: colors.background,
-    },
-    adSpace: {
-      marginTop: 40,
-      backgroundColor: isDarkMode ? colors.cardBackground : '#E8F4FD',
-      padding: 15,
+    themeToggle: {
+      width: 48,
+      height: 48,
       justifyContent: 'center',
       alignItems: 'center',
-      borderRadius: 15,
+      borderRadius: 24,
+    },
+    premiumIcon: {
+      tintColor: colors.gold,
+    },
+    adSpace: {
+      marginTop: 'auto',
+      marginHorizontal: 16,
+      marginBottom: 16,
+      height: 100,
+      backgroundColor: isDarkMode ? 
+        'rgba(255, 255, 255, 0.08)' : 
+        'rgba(255, 255, 255, 0.95)',
+      borderRadius: 16,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...Platform.select({
+        ios: {
+          shadowColor: isDarkMode ? '#FFF' : '#000',
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: isDarkMode ? 0.1 : 0.05,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
     },
     adText: {
-      color: colors.textSecondary,
-      fontSize: 16,
-    },
-    themeToggleText: {
-      fontSize: 24,
+      color: isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+      fontSize: 15,
+      fontWeight: '500',
     },
   });
-};
 
 

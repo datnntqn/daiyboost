@@ -1,93 +1,142 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { 
+  View, 
+  Text, 
+  TouchableOpacity, 
+  SafeAreaView,
+  Image,
+  Switch,
+  Platform,
+} from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { createStyles } from './styles/SettingsScreen.styles';
-import { RootStackParamList } from '../types/navigation';
-
-type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
+import { colors } from '../theme/colors';
 
 type SettingsScreenProps = {
-  navigation: SettingsScreenNavigationProp;
+  navigation: any;
 };
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const { toggleTheme, isDarkMode } = useTheme();
   const styles = createStyles(isDarkMode);
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backIcon}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Settings</Text>
+  const renderSettingItem = (
+    icon: any,
+    text: string,
+    onPress?: () => void,
+    rightComponent?: React.ReactNode,
+    isPremium?: boolean,
+    isLast?: boolean
+  ) => (
+    <TouchableOpacity 
+      style={[
+        styles.settingItem,
+        isLast && styles.lastSettingItem
+      ]}
+      onPress={onPress}
+      disabled={!onPress}
+    >
+      <View style={styles.settingContent}>
+        <Image 
+          source={icon}
+          style={[
+            styles.icon,
+            isPremium && styles.premiumIcon
+          ]}
+        />
+        <Text style={styles.settingText}>{text}</Text>
       </View>
+      {rightComponent || (onPress && (
+        <Image 
+          source={require('../../assets/icons/chevron.png')}
+          style={styles.chevronIcon}
+        />
+      ))}
+    </TouchableOpacity>
+  );
 
-      {/* <TouchableOpacity 
-        style={styles.settingItem} 
-        onPress={() => navigation.navigate('CategoriesStack')}
-      >
-        <View style={styles.settingContent}>
-          <Text style={styles.settingIcon}>🔲</Text>
-          <Text style={styles.settingText}>Categories</Text>
-        </View>
-        <Text style={styles.chevron}>›</Text>
-      </TouchableOpacity> */}
-
-      <TouchableOpacity 
-        style={styles.settingItem} 
-        onPress={() => navigation.navigate('NotificationSettings')}
-      >
-        <View style={styles.settingContent}>
-          <Text style={styles.settingIcon}>🔔</Text>
-          <Text style={styles.settingText}>Notifications</Text>
-        </View>
-        <Text style={styles.chevron}>›</Text>
-      </TouchableOpacity>
-
-      <View style={styles.settingItem}>
-        <View style={styles.settingContent}>
-          <Text style={styles.settingIcon}>{isDarkMode ? '🌙' : '☀️'}</Text>
-          <Text style={styles.settingText}>Theme</Text>
-        </View>
-        <TouchableOpacity onPress={toggleTheme}>
-          <Text style={styles.themeToggleText}>{isDarkMode ? '🌙' : '🌞'}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.sectionTitle}>Premium Features</Text>
-
-      <TouchableOpacity 
-        style={styles.settingItem} 
-        onPress={() => console.log('Go Ad-Free pressed')}
-      >
-        <View style={styles.settingContent}>
-          <Text style={styles.settingIcon}>⭐</Text>
-          <Text style={styles.settingText}>Go Ad-Free</Text>
-        </View>
-        <Text style={styles.chevron}>›</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity 
-        style={styles.settingItem} 
-        onPress={() => console.log('Unlock All Features pressed')}
-      >
-        <View style={styles.settingContent}>
-          <Text style={styles.settingIcon}>🔓</Text>
-          <Text style={styles.settingText}>Unlock All Features</Text>
-        </View>
-        <Text style={styles.chevron}>›</Text>
-      </TouchableOpacity>
-
-      {/* Ad Space Placeholder */}
-      <View style={styles.adSpace}>
-        <Text style={styles.adText}>Ad</Text>
+  const renderSection = (title?: string, children?: React.ReactNode) => (
+    <View style={styles.section}>
+      {title && <Text style={styles.sectionTitle}>{title}</Text>}
+      <View style={styles.sectionBackground}>
+        {children}
       </View>
     </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Image 
+              source={require('../../assets/icons/back.png')}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+          <Text style={styles.title}>Settings</Text>
+        </View>
+
+        {renderSection(undefined, 
+          <>
+            {renderSettingItem(
+              require('../../assets/icons/notification.png'),
+              'Notifications',
+              () => navigation.navigate('NotificationSettings')
+            )}
+
+            {renderSettingItem(
+              isDarkMode ? require('../../assets/icons/moon.png') : require('../../assets/icons/sun.png'),
+              'Dark Mode',
+              undefined,
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleTheme}
+                trackColor={{ 
+                  false: Platform.select({ ios: '#e9e9ea', android: '#767577' }), 
+                  true: Platform.select({ ios: colors.gold, android: colors.gold }) 
+                }}
+                thumbColor={Platform.select({
+                  ios: '#FFFFFF',
+                  android: isDarkMode ? colors.gold : '#f4f3f4'
+                })}
+                ios_backgroundColor="#e9e9ea"
+              />,
+              false,
+              true
+            )}
+          </>
+        )}
+
+        {renderSection('Premium Features',
+          <>
+            {renderSettingItem(
+              require('../../assets/icons/star.png'),
+              'Go Ad-Free',
+              () => console.log('Go Ad-Free pressed'),
+              undefined,
+              true
+            )}
+
+            {renderSettingItem(
+              require('../../assets/icons/unlock.png'),
+              'Unlock All Features',
+              () => console.log('Unlock All Features pressed'),
+              undefined,
+              true,
+              true
+            )}
+          </>
+        )}
+
+        <View style={styles.adSpace}>
+          <Text style={styles.adText}>Advertisement</Text>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

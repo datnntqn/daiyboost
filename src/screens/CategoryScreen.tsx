@@ -14,7 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import { createStyles } from './styles/CategoryScreen.styles';
 import { quotes } from '../data/quotes';
-import { Quote, CategoryType } from '../types/Quote';
+import { Quote } from '../types/Quote';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { categoryAssets } from '../constants/categoryAssets';

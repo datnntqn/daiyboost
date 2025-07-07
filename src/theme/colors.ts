@@ -22,30 +22,49 @@ export const getThemeColors = (isDarkMode: boolean): ThemeColors => ({
 
 export const lightColors = {
   background: '#FFFFFF',
-  backgroundSecondary: '#F8FAFC',
-  text: '#1E293B',
-  textSecondary: '#64748B',
-  primary: '#0EA5E9',
-  border: '#E2E8F0',
-  switchTrackActive: '#93C5FD',
-  switchTrackInactive: '#E2E8F0',
-  switchThumbActive: '#3B82F6',
+  backgroundSecondary: '#F5F5F5',
+  text: '#000000',
+  textSecondary: '#666666',
+  primary: '#007AFF',
+  border: '#E5E5E5',
+  switchTrackActive: '#34C759',
+  switchTrackInactive: '#E9E9EA',
+  switchThumbActive: '#FFFFFF',
   switchThumbInactive: '#FFFFFF',
   cardBackground: '#FFFFFF',
-  modalOverlay: 'rgba(0, 0, 0, 0.5)',
+  modalOverlay: 'rgba(0, 0, 0, 0.4)',
+  card: '#FFFFFF',
 };
 
 export const darkColors = {
-  background: '#1E293B',
-  backgroundSecondary: '#0F172A',
-  text: '#F8FAFC',
-  textSecondary: '#CBD5E1',
-  primary: '#38BDF8',
-  border: '#334155',
-  switchTrackActive: '#60A5FA',
-  switchTrackInactive: '#334155',
-  switchThumbActive: '#38BDF8',
-  switchThumbInactive: '#94A3B8',
-  cardBackground: '#334155',
-  modalOverlay: 'rgba(0, 0, 0, 0.7)',
+  background: '#000000',
+  backgroundSecondary: '#1C1C1E',
+  text: '#FFFFFF',
+  textSecondary: '#EBEBF5',
+  primary: '#0A84FF',
+  border: '#38383A',
+  switchTrackActive: '#32D74B',
+  switchTrackInactive: '#39393D',
+  switchThumbActive: '#FFFFFF',
+  switchThumbInactive: '#FFFFFF',
+  cardBackground: '#1C1C1E',
+  modalOverlay: 'rgba(0, 0, 0, 0.6)',
+  card: '#1C1C1E',
+};
+
+export const colors = {
+  // Light theme colors
+  lightBackground: '#FFFFFF',
+  lightText: '#000000',
+  lightBorder: '#E5E5EA',
+  lightSecondary: '#F2F2F7',
+
+  // Dark theme colors
+  darkBackground: '#000000',
+  darkText: '#FFFFFF',
+  darkBorder: '#38383A',
+  darkSecondary: '#1C1C1E',
+
+  // Common colors
+  gold: '#FFD700',
 }; 
