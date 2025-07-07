@@ -4,7 +4,6 @@ import { fonts, fontSizes, fontWeights } from '../../theme/fonts';
 
 // Lấy kích thước màn hình để tính toán layout tốt hơn
 const { width } = Dimensions.get('window');
-const ScreenHeight = Dimensions.get('window').height;
 
 export const createStyles = (isDarkMode: boolean) => {
   const colors = isDarkMode ? darkColors : lightColors;
@@ -95,21 +94,35 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     quoteContainer: {
       flex: 1,
-      paddingTop: ScreenHeight * 0.15,
+      justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 30,
     },
     quoteText: {
-      fontSize: 30,
-      color: '#ffff',
+      fontSize: fontSizes.xxlarge,
+      fontFamily: fonts.playfairDisplayRegular,
+      color: '#FFFFFF',
       textAlign: 'center',
-      fontWeight: fontWeights.medium,
-      lineHeight: 46,
-      fontFamily: fonts.playfairDisplayBold,
-      textShadowColor: 'rgba(0, 0, 0, 0.75)',
-      textShadowOffset: { width: 2, height: 2 },
-      textShadowRadius: 10,
       letterSpacing: 0.5,
+      lineHeight: 38,
+      textShadowColor: 'rgba(0, 0, 0, 0.85)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 4,
+      fontWeight: '600',
+    },
+    authorText: {
+      fontSize: fontSizes.medium,
+      fontFamily: fonts.playfairDisplayRegular,
+      color: '#FFFFFF',
+      textAlign: 'center',
+      letterSpacing: 0.5,
+      opacity: 1,
+      textShadowColor: 'rgba(0, 0, 0, 0.85)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 4,
+      marginTop: 10,
+      fontStyle: 'italic',
+      fontWeight: '500',
     },
     bottomBar: {
       flexDirection: 'row',

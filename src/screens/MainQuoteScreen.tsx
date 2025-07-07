@@ -261,7 +261,10 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
 
             <View style={styles.quoteContainer}>
               <Text style={styles.quoteText}>
-                {safeQuote.text}
+                "{safeQuote.text}"
+              </Text>
+              <Text style={styles.authorText}>
+                - {safeQuote.author}
               </Text>
             </View>
 
