@@ -95,13 +95,13 @@ export const createStyles = (isDarkMode: boolean) => {
     },
     quoteContainer: {
       flex: 1,
-      paddingTop: ScreenHeight * 0.1,
+      paddingTop: ScreenHeight * 0.15,
       alignItems: 'center',
       paddingHorizontal: 30,
     },
     quoteText: {
-      fontSize: fontSizes.xxlarge,
-      color: '#fff',
+      fontSize: 30,
+      color: '#ffff',
       textAlign: 'center',
       fontWeight: fontWeights.medium,
       lineHeight: 46,
