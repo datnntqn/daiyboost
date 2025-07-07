@@ -39,7 +39,8 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     return quotes && quotes.length > 0 ? quotes[currentQuoteIndex % quotes.length] : {
       id: '0',
       text: 'Be kind to yourself every day.',
-      category: 'Self-Love' as CategoryKey
+      category: 'Self-Love' as CategoryKey,
+      author: 'Anonymous'
     };
   }, [currentQuoteIndex]);
 
@@ -270,7 +271,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
 
             <View style={styles.bottomBar}>
               <Text style={styles.categoryText}>
-                {safeQuote.category}
+                MotiveMe.app
               </Text>
             </View>
           </SafeAreaView>
