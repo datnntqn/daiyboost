@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -9,6 +9,7 @@ import {
   ImageBackground,
   Image,
   GestureResponderEvent,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { quotes, getBackgroundImage, CategoryKey, Quote } from '../data/quotes';
@@ -29,12 +30,13 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
-  const [_totalFavorites, setTotalFavorites] = useState(0);
   const [startY, setStartY] = useState(0);
-  const [_forceUpdate, _setForceUpdate] = useState(0);
   const viewShotRef = useRef<ViewShot>(null);
 
-  // Đảm bảo có dữ liệu hợp lệ với useMemo
+  // Tải trước hình ảnh
+  const heartActiveIcon = require('../../assets/icons/heart-active.png');
+  const heartInactiveIcon = require('../../assets/icons/heart-inactive.png');
+
   const safeQuote = useMemo(() => {
     return quotes && quotes.length > 0 ? quotes[currentQuoteIndex % quotes.length] : {
       id: '0',
@@ -44,30 +46,20 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     };
   }, [currentQuoteIndex]);
 
-  const checkIfFavorite = useCallback(() => {
-    const isFav = favoriteQuotes.some(quote => quote.id === safeQuote.id);
-    setIsFavorite(isFav);
-  }, [favoriteQuotes, safeQuote.id]);
+  const backgroundImage = useMemo(() => {
+    return getBackgroundImage(safeQuote.category);
+  }, [safeQuote.category]);
 
   useEffect(() => {
     loadFavoriteQuotes();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // Chỉ chạy một lần khi component mount
+  }, []);
 
   useEffect(() => {
-    checkIfFavorite();
-  }, [checkIfFavorite, safeQuote.id]);
-
-  // Cập nhật trạng thái yêu thích khi quote thay đổi
-  useEffect(() => {
-    if (favoriteQuotes.length > 0) {
-      const isCurrentQuoteFavorite = favoriteQuotes.some(quote => quote.id === safeQuote.id);
-      if (isCurrentQuoteFavorite !== isFavorite) {
-        setIsFavorite(isCurrentQuoteFavorite);
-        console.log('Updating favorite status for new quote:', isCurrentQuoteFavorite);
-      }
-    }
-  }, [safeQuote.id, favoriteQuotes, isFavorite]);
+    // Cập nhật lại trạng thái isFavorite khi quote thay đổi
+    const isFav = favoriteQuotes.some(quote => quote.id === safeQuote.id);
+    console.log(`Quote ${safeQuote.id} isFavorite: ${isFav}`);
+    setIsFavorite(isFav);
+  }, [safeQuote.id, favoriteQuotes]);
 
   const loadFavoriteQuotes = async () => {
     try {
@@ -77,113 +69,76 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
       if (savedQuotes) {
         try {
           const parsedQuotes = JSON.parse(savedQuotes);
-          
-          // Đảm bảo dữ liệu đọc được là một mảng
           if (Array.isArray(parsedQuotes)) {
-            console.log('Loaded favorites successfully. Count:', parsedQuotes.length);
             setFavoriteQuotes(parsedQuotes);
-            setTotalFavorites(parsedQuotes.length);
-            
-            // Kiểm tra xem quote hiện tại có trong danh sách yêu thích không
-            const isCurrentQuoteFavorite = parsedQuotes.some(quote => quote.id === safeQuote.id);
-            setIsFavorite(isCurrentQuoteFavorite);
-            console.log('Current quote favorite status:', isCurrentQuoteFavorite);
+            console.log('Loaded favorites successfully. Count:', parsedQuotes.length);
           } else {
-            console.warn('Saved favorites is not an array, resetting to empty array');
             setFavoriteQuotes([]);
-            setTotalFavorites(0);
-            setIsFavorite(false);
           }
-        } catch (parseError) {
-          console.error('Error parsing favorite quotes:', parseError);
+        } catch (error) {
+          console.error('Error parsing favorites:', error);
           setFavoriteQuotes([]);
-          setTotalFavorites(0);
-          setIsFavorite(false);
         }
       } else {
-        console.log('No saved favorites found');
         setFavoriteQuotes([]);
-        setTotalFavorites(0);
-        setIsFavorite(false);
+        console.log('No saved favorites found');
       }
     } catch (error) {
       console.error('Error loading favorite quotes:', error);
       setFavoriteQuotes([]);
-      setTotalFavorites(0);
-      setIsFavorite(false);
     }
-  };
-
-  // Lấy background image dựa trên category
-  const backgroundImage = useMemo(() => {
-    return getBackgroundImage(safeQuote.category);
-  }, [safeQuote.category]);
-
-// const backgroundImage = require('../../assets/backgrounds/success.jpg');
-
-  const handleNextQuote = () => {
-    setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
   };
 
   const toggleFavorite = async () => {
     try {
-      console.log('Before toggle - isFavorite:', isFavorite);
+      // Cập nhật UI ngay lập tức
+      const newFavoriteState = !isFavorite;
+      console.log(`Toggling favorite from ${isFavorite} to ${newFavoriteState}`);
+      setIsFavorite(newFavoriteState);
       
-      // Cập nhật state ngay lập tức để UI thay đổi
-      setIsFavorite(!isFavorite);
-      
-      // Lấy danh sách favorites hiện tại từ AsyncStorage
+      // Lấy danh sách hiện tại
       const savedQuotesStr = await AsyncStorage.getItem('favorite_quotes');
       let currentFavorites: Quote[] = [];
       
       if (savedQuotesStr) {
         try {
-          currentFavorites = JSON.parse(savedQuotesStr);
-          // Đảm bảo dữ liệu đọc được là một mảng
-          if (!Array.isArray(currentFavorites)) {
-            currentFavorites = [];
-          }
-        } catch (parseError) {
-          console.error('Error parsing favorites:', parseError);
+          const parsed = JSON.parse(savedQuotesStr);
+          currentFavorites = Array.isArray(parsed) ? parsed : [];
+        } catch {
           currentFavorites = [];
         }
       }
       
       let updatedFavorites: Quote[];
       
-      if (isFavorite) {
-        // Xóa khỏi danh sách yêu thích
-        console.log('Removing from favorites:', safeQuote.id);
-        updatedFavorites = currentFavorites.filter(quote => quote.id !== safeQuote.id);
-      } else {
+      if (newFavoriteState) {
         // Thêm vào danh sách yêu thích
         console.log('Adding to favorites:', safeQuote.id);
-        // Kiểm tra xem quote đã tồn tại trong danh sách chưa
-        const quoteExists = currentFavorites.some(quote => quote.id === safeQuote.id);
-        if (!quoteExists) {
-          updatedFavorites = [...currentFavorites, safeQuote];
-        } else {
-          updatedFavorites = currentFavorites;
-        }
+        const exists = currentFavorites.some(q => q.id === safeQuote.id);
+        updatedFavorites = exists ? currentFavorites : [...currentFavorites, safeQuote];
+      } else {
+        // Xóa khỏi danh sách yêu thích
+        console.log('Removing from favorites:', safeQuote.id);
+        updatedFavorites = currentFavorites.filter(q => q.id !== safeQuote.id);
       }
       
       // Lưu vào AsyncStorage
       await AsyncStorage.setItem('favorite_quotes', JSON.stringify(updatedFavorites));
-      console.log('Saved to AsyncStorage. Total favorites:', updatedFavorites.length);
       
       // Cập nhật state
       setFavoriteQuotes(updatedFavorites);
-      setTotalFavorites(updatedFavorites.length);
-      
-      console.log('After toggle - isFavorite set to:', !isFavorite);
+      console.log('Favorites updated. Count:', updatedFavorites.length);
     } catch (error) {
-      console.error('Error updating favorite quotes:', error);
-      // Revert UI state if there was an error
-      setIsFavorite(isFavorite);
+      console.error('Error updating favorites:', error);
+      setIsFavorite(!isFavorite); // Khôi phục UI nếu có lỗi
+      Alert.alert('Error', 'Failed to update favorites');
     }
   };
 
-  // Xử lý sự kiện vuốt lên
+  const handleNextQuote = () => {
+    setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
+  };
+
   const handleTouchStart = (event: GestureResponderEvent) => {
     setStartY(event.nativeEvent.pageY);
   };
@@ -191,11 +146,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const handleTouchEnd = (event: GestureResponderEvent) => {
     const endY = event.nativeEvent.pageY;
     const deltaY = startY - endY;
-    
-    // Nếu vuốt lên (deltaY > 0) và khoảng cách đủ lớn (> 50)
-    if (deltaY > 50) {
-      handleNextQuote();
-    }
+    if (deltaY > 50) handleNextQuote();
   };
 
   const handleShare = async () => {
@@ -212,6 +163,18 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
       console.log('Error sharing:', error);
     }
   };
+
+  // Memoize heart icon để tránh render lại không cần thiết
+  const heartIconMemo = useMemo(() => {
+    console.log('Creating memoized heart icon with isFavorite =', isFavorite);
+    return (
+      <Image
+        testID={`heart-icon-${isFavorite ? 'active' : 'inactive'}`}
+        source={isFavorite ? heartActiveIcon : heartInactiveIcon}
+        style={[styles.actionButtonIcon, isFavorite && styles.redHeartIcon]}
+      />
+    );
+  }, [isFavorite, styles.actionButtonIcon, styles.redHeartIcon, heartActiveIcon, heartInactiveIcon]);
 
   return (
     <View 
@@ -253,10 +216,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
                 onPress={toggleFavorite}
                 activeOpacity={0.6}
               >
-                <Image
-                  source={isFavorite ? require('../../assets/icons/heart-active.png') : require('../../assets/icons/heart-inactive.png')}
-                  style={styles.actionButtonIcon}
-                />
+                {heartIconMemo}
               </TouchableOpacity>
             </View>
 
@@ -282,5 +242,3 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
 };
 
 export default MainQuoteScreen;
-
-

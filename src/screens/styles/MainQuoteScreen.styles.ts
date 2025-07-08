@@ -389,6 +389,9 @@ export const createStyles = (isDarkMode: boolean) => {
       bottom: 0,
       backgroundColor: 'transparent',
     },
+    redHeartIcon: {
+      tintColor: '#FF0000', // Màu đỏ cho icon yêu thích
+    },
   });
 };
 
