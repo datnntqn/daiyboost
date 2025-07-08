@@ -8,10 +8,14 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
+  Platform,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { BlurView } from '@react-native-community/blur';
 
 const { width } = Dimensions.get('window');
+const ITEM_SPACING = 12;
+const ITEM_WIDTH = (width - 40 - ITEM_SPACING) / 2;
 
 export type BackgroundOption = {
   id: string;
@@ -42,36 +46,46 @@ const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const { isDarkMode } = useTheme();
 
-  const renderBackgroundItem = ({ item }: { item: BackgroundOption }) => (
-    <TouchableOpacity
-      style={[
-        styles.backgroundItem,
-        selectedBackgroundId === item.id && styles.selectedItem,
-      ]}
-      onPress={() => {
-        onSelectBackground(item);
-        setModalVisible(false);
-      }}
-    >
-      <Image source={item.source} style={styles.backgroundImage} />
-      <View style={[
-        styles.backgroundNameContainer,
-        { backgroundColor: isDarkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)' }
-      ]}>
-        <Text style={[
-          styles.backgroundName,
-          { color: isDarkMode ? '#FFFFFF' : '#000000' }
-        ]}>
-          {item.name}
-        </Text>
-      </View>
-      {selectedBackgroundId === item.id && (
-        <View style={styles.selectedOverlay}>
-          <Text style={styles.checkIcon}>✓</Text>
+  const renderBackgroundItem = (item: BackgroundOption) => {
+    const isSelected = selectedBackgroundId === item.id;
+    
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={[
+          styles.backgroundItem,
+          isSelected && styles.selectedItem,
+        ]}
+        onPress={() => {
+          onSelectBackground(item);
+          setModalVisible(false);
+        }}
+        activeOpacity={0.7}
+      >
+        <Image source={item.source} style={styles.backgroundImage} />
+        <View style={styles.overlay} />
+        <View style={styles.backgroundNameWrapper}>
+          <Text style={styles.backgroundName}>
+            {item.name}
+          </Text>
         </View>
-      )}
-    </TouchableOpacity>
-  );
+        {isSelected && (
+          <View style={styles.selectedOverlay}>
+            <Text style={styles.checkIcon}>✓</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+  const modalContainerStyle = {
+    ...styles.modalContainer,
+    backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+  };
+
+  const textStyle = {
+    color: isDarkMode ? '#FFFFFF' : '#000000',
+  };
 
   return (
     <>
@@ -92,32 +106,35 @@ const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={[
-          styles.modalContainer,
-          { backgroundColor: isDarkMode ? 'rgba(0,0,0,0.95)' : 'rgba(255,255,255,0.95)' }
-        ]}>
-          <View style={styles.modalHeader}>
-            <Text style={[
-              styles.modalTitle,
-              { color: isDarkMode ? '#FFFFFF' : '#000000' }
-            ]}>
-              Choose Background
-            </Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={[
-                styles.closeButtonText,
-                { color: isDarkMode ? '#FFFFFF' : '#000000' }
-              ]}>×</Text>
-            </TouchableOpacity>
-          </View>
+        <BlurView
+          style={modalContainerStyle}
+          blurType={isDarkMode ? 'dark' : 'light'}
+          blurAmount={25}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={[styles.closeButtonText, textStyle]}>×</Text>
+              </TouchableOpacity>
+              <Text style={[styles.modalTitle, textStyle]}>
+                Choose Background
+              </Text>
+              <View style={styles.headerRight} />
+            </View>
 
-          <ScrollView contentContainerStyle={styles.gridContainer} showsVerticalScrollIndicator={false}>
-            {backgroundOptions.map((item) => renderBackgroundItem({ item }))}
-          </ScrollView>
-        </View>
+            <ScrollView 
+              contentContainerStyle={styles.gridContainer}
+              showsVerticalScrollIndicator={false}
+              bounces={true}
+            >
+              {backgroundOptions.map(item => renderBackgroundItem(item))}
+            </ScrollView>
+          </View>
+        </BlurView>
       </Modal>
     </>
   );
@@ -138,71 +155,107 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-start',
-    paddingTop: 50,
+  },
+  modalContent: {
+    flex: 1,
+    marginTop: Platform.OS === 'ios' ? 50 : 30,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  headerRight: {
+    width: 50,  // Match close button width for center alignment
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 17,
     fontWeight: '600',
+    textAlign: 'center',
   },
   closeButton: {
-    padding: 10,
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   closeButtonText: {
-    fontSize: 32,
-    fontWeight: '300',
+    fontSize: 28,
+    fontWeight: '400',
+    lineHeight: 28,
   },
   gridContainer: {
-    padding: 10,
+    padding: 16,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    gap: ITEM_SPACING,
   },
   backgroundItem: {
-    width: (width - 40) / 2,
-    height: (width - 40) / 2,
-    marginBottom: 10,
-    borderRadius: 12,
+    width: ITEM_WIDTH,
+    height: ITEM_WIDTH * 1.3, // Make items slightly taller
+    borderRadius: 16,
     overflow: 'hidden',
+    backgroundColor: '#f0f0f0',
   },
   backgroundImage: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
   },
-  backgroundNameContainer: {
+  overlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 8,
+    height: 70,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+  },
+  backgroundNameWrapper: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backgroundName: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
     textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   selectedItem: {
     borderWidth: 3,
-    borderColor: '#FFD700',
+    borderColor: '#007AFF',
   },
   selectedOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [
+      { translateX: -20 },
+      { translateY: -20 }
+    ],
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#007AFF',
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkIcon: {
-    fontSize: 32,
-    fontWeight: '600',
     color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '600',
   },
 });
 
