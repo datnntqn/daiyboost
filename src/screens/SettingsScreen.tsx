@@ -7,6 +7,7 @@ import {
   Image,
   Switch,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { createStyles } from './styles/SettingsScreen.styles';
@@ -55,8 +56,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  const renderSection = (title?: string, children?: React.ReactNode) => (
-    <View style={styles.section}>
+  const renderSection = (title?: string, children?: React.ReactNode, customStyle?: object) => (
+    <View style={[styles.section, customStyle]}>
       {title && <Text style={styles.sectionTitle}>{title}</Text>}
       <View style={styles.sectionBackground}>
         {children}
@@ -71,70 +72,70 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           <TouchableOpacity 
             style={styles.backButton}
             onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
           >
-            <Image 
-              source={require('../../assets/icons/back.png')}
-              style={styles.icon}
-            />
+            <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Settings</Text>
         </View>
 
-        {renderSection(undefined, 
-          <>
-            {renderSettingItem(
-              require('../../assets/icons/notification.png'),
-              'Notifications',
-              () => navigation.navigate('NotificationSettings')
-            )}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {renderSection(undefined, 
+            <>
+              {renderSettingItem(
+                require('../../assets/icons/notification.png'),
+                'Notifications',
+                () => navigation.navigate('NotificationSettings')
+              )}
 
-            {renderSettingItem(
-              isDarkMode ? require('../../assets/icons/moon.png') : require('../../assets/icons/sun.png'),
-              'Dark Mode',
-              undefined,
-              <Switch
-                value={isDarkMode}
-                onValueChange={toggleTheme}
-                trackColor={{ 
-                  false: Platform.select({ ios: '#e9e9ea', android: '#767577' }), 
-                  true: Platform.select({ ios: colors.gold, android: colors.gold }) 
-                }}
-                thumbColor={Platform.select({
-                  ios: '#FFFFFF',
-                  android: isDarkMode ? colors.gold : '#f4f3f4'
-                })}
-                ios_backgroundColor="#e9e9ea"
-              />,
-              false,
-              true
-            )}
-          </>
-        )}
+              {renderSettingItem(
+                isDarkMode ? require('../../assets/icons/moon.png') : require('../../assets/icons/sun.png'),
+                'Dark Mode',
+                undefined,
+                <Switch
+                  value={isDarkMode}
+                  onValueChange={toggleTheme}
+                  trackColor={{ 
+                    false: Platform.select({ ios: '#e9e9ea', android: '#767577' }), 
+                    true: Platform.select({ ios: colors.gold, android: colors.gold }) 
+                  }}
+                  thumbColor={Platform.select({
+                    ios: '#FFFFFF',
+                    android: isDarkMode ? colors.gold : '#f4f3f4'
+                  })}
+                  ios_backgroundColor="#e9e9ea"
+                />,
+                false,
+                true
+              )}
+            </>
+          )}
 
-        {renderSection('Premium Features',
-          <>
-            {renderSettingItem(
-              require('../../assets/icons/star.png'),
-              'Go Ad-Free',
-              () => console.log('Go Ad-Free pressed'),
-              undefined,
-              true
-            )}
+          {renderSection('Premium Features',
+            <>
+              {renderSettingItem(
+                require('../../assets/icons/star.png'),
+                'Go Ad-Free',
+                () => console.log('Go Ad-Free pressed'),
+                undefined,
+                true
+              )}
 
-            {renderSettingItem(
-              require('../../assets/icons/unlock.png'),
-              'Unlock All Features',
-              () => console.log('Unlock All Features pressed'),
-              undefined,
-              true,
-              true
-            )}
-          </>
-        )}
+              {renderSettingItem(
+                require('../../assets/icons/unlock.png'),
+                'Unlock All Features',
+                () => console.log('Unlock All Features pressed'),
+                undefined,
+                true,
+                true
+              )}
+            </>
+          , styles.premiumSection)}
 
-        <View style={styles.adSpace}>
-          <Text style={styles.adText}>Advertisement</Text>
-        </View>
+          <View style={styles.adSpace}>
+            <Text style={styles.adText}>Advertisement</Text>
+          </View>
+        </ScrollView>
       </View>
     </SafeAreaView>
   );

@@ -16,6 +16,7 @@ export const createStyles = (isDarkMode: boolean) =>
       backgroundColor: isDarkMode ? 
         'rgba(0, 0, 0, 0.95)' : 
         'rgba(242, 242, 247, 0.95)',
+      paddingBottom: 16,
     },
     header: {
       flexDirection: 'row',
@@ -23,18 +24,23 @@ export const createStyles = (isDarkMode: boolean) =>
       paddingVertical: 16,
       paddingHorizontal: 16,
       backgroundColor: 'transparent',
-      marginBottom: 8,
+      marginBottom: 16,
     },
     backButton: {
-      width: 32,
-      height: 32,
-      justifyContent: 'center',
+      flexDirection: 'row',
       alignItems: 'center',
-      borderRadius: 16,
-      marginRight: 12,
       backgroundColor: isDarkMode ? 
         'rgba(255, 255, 255, 0.1)' : 
         'rgba(0, 0, 0, 0.05)',
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderRadius: 20,
+      marginRight: 10,
+    },
+    backButtonText: {
+      fontSize: 20,
+      color: isDarkMode ? colors.darkText : colors.lightText,
+      marginRight: 4,
     },
     title: {
       fontSize: 32,
@@ -43,15 +49,15 @@ export const createStyles = (isDarkMode: boolean) =>
       letterSpacing: 0.35,
     },
     section: {
-      marginTop: 32,
+      marginVertical: 16,
       width: width,
     },
     sectionTitle: {
       fontSize: 13,
-      fontWeight: '500',
-      marginBottom: 8,
+      fontWeight: '600',
+      marginBottom: 10,
       paddingHorizontal: 16,
-      color: isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+      color: isDarkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)',
       letterSpacing: 0.5,
       textTransform: 'uppercase',
     },
@@ -62,17 +68,33 @@ export const createStyles = (isDarkMode: boolean) =>
       borderRadius: 12,
       marginHorizontal: 16,
       overflow: 'hidden',
+      ...Platform.select({
+        ios: {
+          shadowColor: isDarkMode ? '#FFF' : '#000',
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: isDarkMode ? 0.1 : 0.05,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
+      borderWidth: 1,
+      borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
     },
     settingItem: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingVertical: 11,
+      paddingVertical: 14,
       paddingHorizontal: 16,
-      borderBottomWidth: 0.5,
+      borderBottomWidth: 1,
       borderBottomColor: isDarkMode ? 
         'rgba(255, 255, 255, 0.1)' : 
-        'rgba(0, 0, 0, 0.1)',
+        'rgba(0, 0, 0, 0.05)',
     },
     lastSettingItem: {
       borderBottomWidth: 0,
@@ -85,7 +107,7 @@ export const createStyles = (isDarkMode: boolean) =>
     icon: {
       width: 20,
       height: 20,
-      marginRight: 12,
+      marginRight: 8,
       tintColor: isDarkMode ? colors.darkText : colors.lightText,
     },
     chevronIcon: {
@@ -110,6 +132,9 @@ export const createStyles = (isDarkMode: boolean) =>
     premiumIcon: {
       tintColor: colors.gold,
     },
+    premiumSection: {
+      marginTop: 24,
+    },
     adSpace: {
       marginTop: 'auto',
       marginHorizontal: 16,
@@ -121,6 +146,8 @@ export const createStyles = (isDarkMode: boolean) =>
       borderRadius: 16,
       justifyContent: 'center',
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
       ...Platform.select({
         ios: {
           shadowColor: isDarkMode ? '#FFF' : '#000',
