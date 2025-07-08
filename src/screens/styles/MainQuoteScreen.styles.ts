@@ -47,6 +47,16 @@ export const createStyles = (isDarkMode: boolean) => {
       paddingHorizontal: 20,
       marginTop: 20,
     },
+    leftActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    rightActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
     heartButton: {
       width: 40,
       height: 40,

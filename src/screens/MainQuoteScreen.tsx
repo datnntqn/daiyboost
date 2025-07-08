@@ -18,6 +18,7 @@ import { useTheme } from '../context/ThemeContext';
 import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import LinearGradient from 'react-native-linear-gradient';
+import BackgroundPicker, { BackgroundOption, backgroundOptions } from '../components/BackgroundPicker';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -32,6 +33,8 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
   const [startY, setStartY] = useState(0);
   const viewShotRef = useRef<ViewShot>(null);
+  const [selectedBackgroundId, setSelectedBackgroundId] = useState('default');
+  const [customBackground, setCustomBackground] = useState<any>(null);
 
   // Tải trước hình ảnh
   const heartActiveIcon = require('../../assets/icons/heart-active.png');
@@ -47,11 +50,15 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   }, [currentQuoteIndex]);
 
   const backgroundImage = useMemo(() => {
+    if (customBackground) {
+      return customBackground;
+    }
     return getBackgroundImage(safeQuote.category);
-  }, [safeQuote.category]);
+  }, [safeQuote.category, customBackground]);
 
   useEffect(() => {
     loadFavoriteQuotes();
+    loadCustomBackground();
   }, []);
 
   useEffect(() => {
@@ -86,6 +93,40 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     } catch (error) {
       console.error('Error loading favorite quotes:', error);
       setFavoriteQuotes([]);
+    }
+  };
+
+  const loadCustomBackground = async () => {
+    try {
+      const savedBackgroundId = await AsyncStorage.getItem('selected_background_id');
+      if (savedBackgroundId) {
+        setSelectedBackgroundId(savedBackgroundId);
+        if (savedBackgroundId !== 'default') {
+          const backgroundOption = backgroundOptions.find((bg: BackgroundOption) => bg.id === savedBackgroundId);
+          if (backgroundOption) {
+            setCustomBackground(backgroundOption.source);
+          }
+        } else {
+          setCustomBackground(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading custom background:', error);
+    }
+  };
+
+  const handleBackgroundSelect = async (background: BackgroundOption) => {
+    try {
+      await AsyncStorage.setItem('selected_background_id', background.id);
+      setSelectedBackgroundId(background.id);
+      if (background.id === 'default') {
+        setCustomBackground(null);
+      } else {
+        setCustomBackground(background.source);
+      }
+    } catch (error) {
+      console.error('Error saving custom background:', error);
+      Alert.alert('Error', 'Failed to save background preference');
     }
   };
 
@@ -200,24 +241,33 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
           
           <SafeAreaView style={styles.safeAreaContainer}>
             <View style={styles.topBar}>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={handleShare}
-                activeOpacity={0.6}
-              >
-                <Image
-                  source={require('../../assets/icons/share.png')}
-                  style={styles.actionButtonIcon}
+              <View style={styles.leftActions}>
+                <BackgroundPicker
+                  onSelectBackground={handleBackgroundSelect}
+                  selectedBackgroundId={selectedBackgroundId}
                 />
-              </TouchableOpacity>
+              </View>
 
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={toggleFavorite}
-                activeOpacity={0.6}
-              >
-                {heartIconMemo}
-              </TouchableOpacity>
+              <View style={styles.rightActions}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={handleShare}
+                  activeOpacity={0.6}
+                >
+                  <Image
+                    source={require('../../assets/icons/share.png')}
+                    style={styles.actionButtonIcon}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={toggleFavorite}
+                  activeOpacity={0.6}
+                >
+                  {heartIconMemo}
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.quoteContainer}>
