@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Modal,
@@ -17,33 +17,49 @@ const { width } = Dimensions.get('window');
 const ITEM_SPACING = 12;
 const ITEM_WIDTH = (width - 40 - ITEM_SPACING) / 2;
 
+export type Category = {
+  id: string;
+  name: string;
+  icon?: any;
+};
+
+export const categories: Category[] = [
+  { id: 'all', name: 'All' },
+  { id: 'nature', name: 'Nature' },
+  { id: 'minimal', name: 'Minimal' },
+  { id: 'productivity', name: 'Productivity' },
+  { id: 'mindfulness', name: 'Mindfulness' },
+  { id: 'motivation', name: 'Motivation' },
+];
+
 export type BackgroundOption = {
   id: string;
   source: any;
   name: string;
+  categoryIds: string[];
 };
 
 export const backgroundOptions: BackgroundOption[] = [
-  { id: 'default', source: require('../../assets/main_quote_background.png'), name: 'Default' },
-  { id: 'beach', source: require('../../assets/beach.jpg'), name: 'Beach' },
-  { id: 'happiness', source: require('../../assets/backgrounds/happiness.jpg'), name: 'Happiness' },
-  { id: 'inspiration', source: require('../../assets/backgrounds/inspiration.jpg'), name: 'Inspiration' },
-  { id: 'mindfulness', source: require('../../assets/backgrounds/mindfulness.jpg'), name: 'Mindfulness' },
-  { id: 'productivity', source: require('../../assets/backgrounds/productivity.jpg'), name: 'Productivity' },
-  { id: 'self_love', source: require('../../assets/backgrounds/self_love.jpg'), name: 'Self Love' },
-  { id: 'success', source: require('../../assets/backgrounds/success.jpg'), name: 'Success' },
-  { id: 'aesthetic', source: require('../../assets/backgrounds_new/aesthetic.jpg'), name: 'Aesthetic' },
-  { id: 'solitude', source: require('../../assets/backgrounds_new/solitude.jpg'), name: 'Solitude' },
-  { id: 'wave', source: require('../../assets/backgrounds_new/wave.jpg'), name: 'Wave' },
-  { id: 'office', source: require('../../assets/backgrounds_new/office.jpg'), name: 'Office' },
-  { id: 'personal_development', source: require('../../assets/backgrounds_new/personal_development.jpg'), name: 'Personal Development' },
-  { id: 'productivity_tips', source: require('../../assets/backgrounds_new/productivity_tips.jpg'), name: 'Productivity Tips' },
-  { id: 'do_it', source: require('../../assets/backgrounds_new/do_it.jpg'), name: 'Do It' },
-  { id: 'rain', source: require('../../assets/backgrounds_new/rain.jpg'), name: 'Rain' },
-  { id: 'minimal', source: require('../../assets/backgrounds_new/minimal.jpg'), name: 'Minimal' },
-  { id: 'nature', source: require('../../assets/backgrounds_new/nature.jpg'), name: 'Nature' },
-  { id: 'calm', source: require('../../assets/backgrounds_new/calm.jpg'), name: 'Calm' },
-  { id: 'forest', source: require('../../assets/backgrounds_new/forest.jpg'), name: 'Forest' },
+  { id: 'default', source: require('../../assets/main_quote_background.png'), name: 'Default', categoryIds: ['all', 'minimal'] },
+  { id: 'beach', source: require('../../assets/beach.jpg'), name: 'Beach', categoryIds: ['all', 'nature'] },
+  { id: 'happiness', source: require('../../assets/backgrounds/happiness.jpg'), name: 'Happiness', categoryIds: ['all', 'mindfulness', 'motivation'] },
+  { id: 'inspiration', source: require('../../assets/backgrounds/inspiration.jpg'), name: 'Inspiration', categoryIds: ['all', 'motivation'] },
+  { id: 'mindfulness', source: require('../../assets/backgrounds/mindfulness.jpg'), name: 'Mindfulness', categoryIds: ['all', 'mindfulness', 'nature'] },
+  { id: 'productivity', source: require('../../assets/backgrounds/productivity.jpg'), name: 'Productivity', categoryIds: ['all', 'productivity'] },
+  { id: 'self_love', source: require('../../assets/backgrounds/self_love.jpg'), name: 'Self Love', categoryIds: ['all', 'mindfulness'] },
+  { id: 'success', source: require('../../assets/backgrounds/success.jpg'), name: 'Success', categoryIds: ['all', 'motivation'] },
+  { id: 'aesthetic', source: require('../../assets/backgrounds_new/aesthetic.jpg'), name: 'Aesthetic', categoryIds: ['all', 'minimal'] },
+  { id: 'solitude', source: require('../../assets/backgrounds_new/solitude.jpg'), name: 'Solitude', categoryIds: ['all', 'mindfulness'] },
+  { id: 'wave', source: require('../../assets/backgrounds_new/wave.jpg'), name: 'Wave', categoryIds: ['all', 'nature'] },
+  { id: 'office', source: require('../../assets/backgrounds_new/office.jpg'), name: 'Office', categoryIds: ['all', 'productivity'] },
+  { id: 'personal_development', source: require('../../assets/backgrounds_new/personal_development.jpg'), name: 'Personal Development', categoryIds: ['all', 'motivation', 'productivity'] },
+  { id: 'productivity_tips', source: require('../../assets/backgrounds_new/productivity_tips.jpg'), name: 'Productivity Tips', categoryIds: ['all', 'productivity'] },
+  { id: 'do_it', source: require('../../assets/backgrounds_new/do_it.jpg'), name: 'Do It', categoryIds: ['all', 'motivation'] },
+  { id: 'rain', source: require('../../assets/backgrounds_new/rain.jpg'), name: 'Rain', categoryIds: ['all', 'nature'] },
+  { id: 'minimal', source: require('../../assets/backgrounds_new/minimal.jpg'), name: 'Minimal', categoryIds: ['all', 'minimal'] },
+  { id: 'nature', source: require('../../assets/backgrounds_new/nature.jpg'), name: 'Nature', categoryIds: ['all', 'nature'] },
+  { id: 'calm', source: require('../../assets/backgrounds_new/calm.jpg'), name: 'Calm', categoryIds: ['all', 'mindfulness'] },
+  { id: 'forest', source: require('../../assets/backgrounds_new/forest.jpg'), name: 'Forest', categoryIds: ['all', 'nature'] },
 ];
 
 type BackgroundPickerProps = {
@@ -56,7 +72,22 @@ const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
   selectedBackgroundId,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const { isDarkMode } = useTheme();
+  const categoryScrollViewRef = useRef<ScrollView>(null);
+  const [filteredBackgrounds, setFilteredBackgrounds] = useState(backgroundOptions);
+
+  useEffect(() => {
+    // Filter backgrounds based on selected category
+    if (selectedCategory === 'all') {
+      setFilteredBackgrounds(backgroundOptions);
+    } else {
+      const filtered = backgroundOptions.filter(bg => 
+        bg.categoryIds.includes(selectedCategory)
+      );
+      setFilteredBackgrounds(filtered);
+    }
+  }, [selectedCategory]);
 
   const renderBackgroundItem = (item: BackgroundOption) => {
     const isSelected = selectedBackgroundId === item.id;
@@ -86,6 +117,33 @@ const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
             <Text style={styles.checkIcon}>✓</Text>
           </View>
         )}
+      </TouchableOpacity>
+    );
+  };
+
+  const renderCategoryItem = (category: Category, _index: number) => {
+    const isSelected = selectedCategory === category.id;
+    
+    return (
+      <TouchableOpacity
+        key={category.id}
+        style={[
+          styles.categoryItem,
+          isSelected && styles.selectedCategoryItem,
+        ]}
+        onPress={() => {
+          setSelectedCategory(category.id);
+        }}
+        activeOpacity={0.7}
+      >
+        <Text 
+          style={[
+            styles.categoryText,
+            isSelected && styles.selectedCategoryText
+          ]}
+        >
+          {category.name}
+        </Text>
       </TouchableOpacity>
     );
   };
@@ -138,12 +196,29 @@ const BackgroundPicker: React.FC<BackgroundPickerProps> = ({
               <View style={styles.headerRight} />
             </View>
 
+            {/* Categories ScrollView */}
+            <View style={styles.categoriesContainer}>
+              <ScrollView
+                ref={categoryScrollViewRef}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.categoriesScrollView}
+                decelerationRate="fast"
+                bounces={true}
+              >
+                {categories.map((category, index) => renderCategoryItem(category, index))}
+              </ScrollView>
+            </View>
+
+            {/* Backgrounds Grid */}
             <ScrollView 
               contentContainerStyle={styles.gridContainer}
               showsVerticalScrollIndicator={false}
               bounces={true}
             >
-              {backgroundOptions.map(item => renderBackgroundItem(item))}
+              <View style={styles.backgroundsGrid}>
+                {filteredBackgrounds.map(item => renderBackgroundItem(item))}
+              </View>
             </ScrollView>
           </View>
         </BlurView>
@@ -199,8 +274,42 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 28,
   },
+  // Categories styles
+  categoriesContainer: {
+    height: 50,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  categoriesScrollView: {
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    height: 50,
+  },
+  categoryItem: {
+    paddingHorizontal: 16,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(142, 142, 147, 0.12)',
+  },
+  selectedCategoryItem: {
+    backgroundColor: '#007AFF',
+  },
+  categoryText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#8E8E93',
+  },
+  selectedCategoryText: {
+    color: '#FFFFFF',
+  },
+  // Backgrounds grid
   gridContainer: {
     padding: 16,
+  },
+  backgroundsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: ITEM_SPACING,
@@ -211,6 +320,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: '#f0f0f0',
+    marginBottom: ITEM_SPACING,
   },
   backgroundImage: {
     width: '100%',
