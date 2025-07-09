@@ -35,6 +35,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const viewShotRef = useRef<ViewShot>(null);
   const [selectedBackgroundId, setSelectedBackgroundId] = useState('default');
   const [customBackground, setCustomBackground] = useState<any>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   // Tải trước hình ảnh
   const heartActiveIcon = require('../../assets/icons/heart-active.png');
@@ -193,14 +194,32 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const handleShare = async () => {
     try {
       if (viewShotRef.current?.capture) {
-        const uri = await viewShotRef.current.capture();
-        await Share.open({
-          url: uri,
-          title: 'Share Quote',
-          message: 'Check out this inspiring quote!',
-        });
+        // Set capturing state to true to hide buttons
+        setIsCapturing(true);
+        
+        // Wait a moment for the UI to update
+        setTimeout(async () => {
+          try {
+            const uri = await viewShotRef.current?.capture();
+            
+            // Set capturing state back to false to show buttons
+            setIsCapturing(false);
+            
+            // Share the captured image
+            await Share.open({
+              url: uri,
+              title: 'Share Quote',
+              message: 'Check out this inspiring quote!',
+            });
+          } catch (error) {
+            // Make sure buttons are shown even if there's an error
+            setIsCapturing(false);
+            console.log('Error capturing or sharing:', error);
+          }
+        }, 300);
       }
     } catch (error) {
+      setIsCapturing(false);
       console.log('Error sharing:', error);
     }
   };
@@ -240,35 +259,37 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
           />
           
           <SafeAreaView style={styles.safeAreaContainer}>
-            <View style={styles.topBar}>
-              <View style={styles.leftActions}>
-                <BackgroundPicker
-                  onSelectBackground={handleBackgroundSelect}
-                  selectedBackgroundId={selectedBackgroundId}
-                />
-              </View>
-
-              <View style={styles.rightActions}>
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={handleShare}
-                  activeOpacity={0.6}
-                >
-                  <Image
-                    source={require('../../assets/icons/share.png')}
-                    style={styles.actionButtonIcon}
+            {!isCapturing && (
+              <View style={styles.topBar}>
+                <View style={styles.leftActions}>
+                  <BackgroundPicker
+                    onSelectBackground={handleBackgroundSelect}
+                    selectedBackgroundId={selectedBackgroundId}
                   />
-                </TouchableOpacity>
+                </View>
 
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={toggleFavorite}
-                  activeOpacity={0.6}
-                >
-                  {heartIconMemo}
-                </TouchableOpacity>
+                <View style={styles.rightActions}>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={handleShare}
+                    activeOpacity={0.6}
+                  >
+                    <Image
+                      source={require('../../assets/icons/share.png')}
+                      style={styles.actionButtonIcon}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={toggleFavorite}
+                    activeOpacity={0.6}
+                  >
+                    {heartIconMemo}
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
+            )}
 
             <View style={styles.quoteContainer}>
               <Text style={styles.quoteText}>
