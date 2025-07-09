@@ -32,6 +32,18 @@ export const backgroundOptions: BackgroundOption[] = [
   { id: 'productivity', source: require('../../assets/backgrounds/productivity.jpg'), name: 'Productivity' },
   { id: 'self_love', source: require('../../assets/backgrounds/self_love.jpg'), name: 'Self Love' },
   { id: 'success', source: require('../../assets/backgrounds/success.jpg'), name: 'Success' },
+  { id: 'aesthetic', source: require('../../assets/backgrounds_new/aesthetic.jpg'), name: 'Aesthetic' },
+  { id: 'solitude', source: require('../../assets/backgrounds_new/solitude.jpg'), name: 'Solitude' },
+  { id: 'wave', source: require('../../assets/backgrounds_new/wave.jpg'), name: 'Wave' },
+  { id: 'office', source: require('../../assets/backgrounds_new/office.jpg'), name: 'Office' },
+  { id: 'personal_development', source: require('../../assets/backgrounds_new/personal_development.jpg'), name: 'Personal Development' },
+  { id: 'productivity_tips', source: require('../../assets/backgrounds_new/productivity_tips.jpg'), name: 'Productivity Tips' },
+  { id: 'do_it', source: require('../../assets/backgrounds_new/do_it.jpg'), name: 'Do It' },
+  { id: 'rain', source: require('../../assets/backgrounds_new/rain.jpg'), name: 'Rain' },
+  { id: 'minimal', source: require('../../assets/backgrounds_new/minimal.jpg'), name: 'Minimal' },
+  { id: 'nature', source: require('../../assets/backgrounds_new/nature.jpg'), name: 'Nature' },
+  { id: 'calm', source: require('../../assets/backgrounds_new/calm.jpg'), name: 'Calm' },
+  { id: 'forest', source: require('../../assets/backgrounds_new/forest.jpg'), name: 'Forest' },
 ];
 
 type BackgroundPickerProps = {
