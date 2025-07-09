@@ -129,9 +129,6 @@ const CategoryScreen = () => {
       <Animated.View 
         style={[
           styles.quoteCard,
-          {
-            transform: [{ scale: scaleAnim }],
-          },
         ]}
       >
         <Text style={styles.quoteText}>{item.text}</Text>

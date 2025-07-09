@@ -194,29 +194,22 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const handleShare = async () => {
     try {
       if (viewShotRef.current?.capture) {
-        // Set capturing state to true to hide buttons
         setIsCapturing(true);
         
-        // Wait a moment for the UI to update
         setTimeout(async () => {
           try {
-            const uri = await viewShotRef.current?.capture();
-            
-            // Set capturing state back to false to show buttons
-            setIsCapturing(false);
-            
-            // Share the captured image
+            const uri = await viewShotRef.current!.capture!();
             await Share.open({
               url: uri,
               title: 'Share Quote',
               message: 'Check out this inspiring quote!',
             });
           } catch (error) {
-            // Make sure buttons are shown even if there's an error
-            setIsCapturing(false);
             console.log('Error capturing or sharing:', error);
+          } finally {
+            setIsCapturing(false);
           }
-        }, 300);
+        }, 10); // Reduced from 100ms to 10ms
       }
     } catch (error) {
       setIsCapturing(false);
