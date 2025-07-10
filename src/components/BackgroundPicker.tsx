@@ -30,6 +30,8 @@ export const categories: Category[] = [
   { id: 'productivity', name: 'Productivity' },
   { id: 'mindfulness', name: 'Mindfulness' },
   { id: 'motivation', name: 'Motivation' },
+  { id: 'scenery', name: 'Scenery' },
+  { id: 'mood', name: 'Mood' },
 ];
 
 export type BackgroundOption = {
@@ -41,25 +43,29 @@ export type BackgroundOption = {
 
 export const backgroundOptions: BackgroundOption[] = [
   { id: 'default', source: require('../../assets/main_quote_background.png'), name: 'Default', categoryIds: ['all', 'minimal'] },
-  { id: 'beach', source: require('../../assets/beach.jpg'), name: 'Beach', categoryIds: ['all', 'nature'] },
-  { id: 'happiness', source: require('../../assets/backgrounds/happiness.jpg'), name: 'Happiness', categoryIds: ['all', 'mindfulness', 'motivation'] },
-  { id: 'inspiration', source: require('../../assets/backgrounds/inspiration.jpg'), name: 'Inspiration', categoryIds: ['all', 'motivation'] },
+  { id: 'beach', source: require('../../assets/beach.jpg'), name: 'Beach', categoryIds: ['all', 'nature', 'scenery', 'mood'] },
+  { id: 'happiness', source: require('../../assets/backgrounds/happiness.jpg'), name: 'Happiness', categoryIds: ['all', 'mindfulness', 'motivation', 'mood'] },
+  { id: 'inspiration', source: require('../../assets/backgrounds/inspiration.jpg'), name: 'Inspiration', categoryIds: ['all', 'motivation', 'mood'] },
   { id: 'mindfulness', source: require('../../assets/backgrounds/mindfulness.jpg'), name: 'Mindfulness', categoryIds: ['all', 'mindfulness', 'nature'] },
   { id: 'productivity', source: require('../../assets/backgrounds/productivity.jpg'), name: 'Productivity', categoryIds: ['all', 'productivity'] },
-  { id: 'self_love', source: require('../../assets/backgrounds/self_love.jpg'), name: 'Self Love', categoryIds: ['all', 'mindfulness'] },
-  { id: 'success', source: require('../../assets/backgrounds/success.jpg'), name: 'Success', categoryIds: ['all', 'motivation'] },
-  { id: 'aesthetic', source: require('../../assets/backgrounds_new/aesthetic.jpg'), name: 'Aesthetic', categoryIds: ['all', 'minimal'] },
-  { id: 'solitude', source: require('../../assets/backgrounds_new/solitude.jpg'), name: 'Solitude', categoryIds: ['all', 'mindfulness'] },
-  { id: 'wave', source: require('../../assets/backgrounds_new/wave.jpg'), name: 'Wave', categoryIds: ['all', 'nature'] },
+  { id: 'self_love', source: require('../../assets/backgrounds/self_love.jpg'), name: 'Self Love', categoryIds: ['all', 'mindfulness', 'mood'] },
+  { id: 'success', source: require('../../assets/backgrounds/success.jpg'), name: 'Success', categoryIds: ['all', 'motivation', 'mood'] },
+  { id: 'aesthetic', source: require('../../assets/backgrounds_new/aesthetic.jpg'), name: 'Aesthetic', categoryIds: ['all', 'minimal', 'mood'] },
+  { id: 'solitude', source: require('../../assets/backgrounds_new/solitude.jpg'), name: 'Solitude', categoryIds: ['all', 'mindfulness', 'mood'] },
+  { id: 'wave', source: require('../../assets/backgrounds_new/wave.jpg'), name: 'Wave', categoryIds: ['all', 'nature', 'scenery'] },
   { id: 'office', source: require('../../assets/backgrounds_new/office.jpg'), name: 'Office', categoryIds: ['all', 'productivity'] },
   { id: 'personal_development', source: require('../../assets/backgrounds_new/personal_development.jpg'), name: 'Personal Development', categoryIds: ['all', 'motivation', 'productivity'] },
   { id: 'productivity_tips', source: require('../../assets/backgrounds_new/productivity_tips.jpg'), name: 'Productivity Tips', categoryIds: ['all', 'productivity'] },
-  { id: 'do_it', source: require('../../assets/backgrounds_new/do_it.jpg'), name: 'Do It', categoryIds: ['all', 'motivation'] },
-  { id: 'rain', source: require('../../assets/backgrounds_new/rain.jpg'), name: 'Rain', categoryIds: ['all', 'nature'] },
+  { id: 'do_it', source: require('../../assets/backgrounds_new/do_it.jpg'), name: 'Do It', categoryIds: ['all', 'motivation', 'mood'] },
+  { id: 'rain', source: require('../../assets/backgrounds_new/rain.jpg'), name: 'Rain', categoryIds: ['all', 'nature', 'scenery', 'mood'] },
   { id: 'minimal', source: require('../../assets/backgrounds_new/minimal.jpg'), name: 'Minimal', categoryIds: ['all', 'minimal'] },
-  { id: 'nature', source: require('../../assets/backgrounds_new/nature.jpg'), name: 'Nature', categoryIds: ['all', 'nature'] },
-  { id: 'calm', source: require('../../assets/backgrounds_new/calm.jpg'), name: 'Calm', categoryIds: ['all', 'mindfulness'] },
-  { id: 'forest', source: require('../../assets/backgrounds_new/forest.jpg'), name: 'Forest', categoryIds: ['all', 'nature'] },
+  { id: 'nature', source: require('../../assets/backgrounds_new/nature.jpg'), name: 'Nature', categoryIds: ['all', 'nature', 'scenery'] },
+  { id: 'calm', source: require('../../assets/backgrounds_new/calm.jpg'), name: 'Calm', categoryIds: ['all', 'mindfulness', 'mood'] },
+  { id: 'forest', source: require('../../assets/backgrounds_new/forest.jpg'), name: 'Forest', categoryIds: ['all', 'nature', 'scenery'] },
+  { id: 'mountain', source: require('../../assets/backgrounds_new/mountain.jpg'), name: 'Mountain', categoryIds: ['all', 'nature', 'scenery'] },
+  { id: 'sunset', source: require('../../assets/backgrounds_new/sunset.jpg'), name: 'Forest', categoryIds: ['all', 'nature', 'scenery', 'mood'] },
+  { id: 'ocean', source: require('../../assets/backgrounds_new/ocean.jpg'), name: 'Coffee', categoryIds: ['all', 'nature', 'scenery', 'mood'] },
+  { id: 'forest_path', source: require('../../assets/backgrounds_new/forest_path.jpg'), name: 'Forest Path', categoryIds: ['all', 'nature', 'scenery'] },
 ];
 
 type BackgroundPickerProps = {
