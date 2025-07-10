@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -15,6 +15,8 @@ import { useTheme } from './src/context/ThemeContext';
 import CustomTabBar from './src/components/CustomTabBar';
 import { lightColors, darkColors } from './src/theme/colors';
 import { RootStackParamList } from './src/types/navigation';
+import notifee, { EventType } from '@notifee/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -134,6 +136,45 @@ const NavigationWrapper = () => {
 };
 
 const App = () => {
+  useEffect(() => {
+    // Xử lý khi người dùng nhấp vào thông báo
+    const setupNotificationHandler = async () => {
+      // Đăng ký foreground handler
+      const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+        switch (type) {
+          case EventType.PRESS:
+            if (detail.notification && detail.notification.data) {
+              const { quoteId } = detail.notification.data;
+              if (quoteId) {
+                // Lưu quoteId để MainQuoteScreen có thể hiển thị
+                AsyncStorage.setItem('display_quote_id', String(quoteId));
+              }
+            }
+            break;
+        }
+      });
+
+      // Kiểm tra xem ứng dụng có được mở từ thông báo không
+      const initialNotification = await notifee.getInitialNotification();
+      if (initialNotification && initialNotification.notification.data) {
+        const { quoteId } = initialNotification.notification.data;
+        if (quoteId) {
+          // Lưu quoteId để MainQuoteScreen có thể hiển thị
+          await AsyncStorage.setItem('display_quote_id', String(quoteId));
+        }
+      }
+
+      return unsubscribe;
+    };
+
+    const unsubscribe = setupNotificationHandler();
+    
+    return () => {
+      // Hủy đăng ký khi component unmount
+      unsubscribe.then(fn => fn());
+    };
+  }, []);
+
   return (
     <ThemeProvider>
       <NavigationContainer>

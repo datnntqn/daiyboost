@@ -60,7 +60,35 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   useEffect(() => {
     loadFavoriteQuotes();
     loadCustomBackground();
+    checkNotificationQuote();
   }, []);
+
+  // Kiểm tra xem có quote từ thông báo không
+  const checkNotificationQuote = async () => {
+    try {
+      const displayQuoteId = await AsyncStorage.getItem('display_quote_id');
+      
+      if (displayQuoteId) {
+        // Tìm quote theo ID
+        const quoteIndex = quotes.findIndex(q => q.id === displayQuoteId);
+        
+        if (quoteIndex !== -1) {
+          setCurrentQuoteIndex(quoteIndex);
+          
+          // Đợi một chút để đảm bảo quote đã được hiển thị
+          setTimeout(async () => {
+            // Xóa ID sau khi đã hiển thị để tránh hiển thị lại khi mở app lần sau
+            await AsyncStorage.removeItem('display_quote_id');
+          }, 1000);
+        } else {
+          // Xóa ID nếu không tìm thấy quote
+          await AsyncStorage.removeItem('display_quote_id');
+        }
+      }
+    } catch (error) {
+      console.error('Error checking notification quote:', error);
+    }
+  };
 
   useEffect(() => {
     // Cập nhật lại trạng thái isFavorite khi quote thay đổi

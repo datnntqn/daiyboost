@@ -17,6 +17,7 @@ export interface NotificationSettings {
 }
 
 const SETTINGS_KEY = '@notification_settings';
+const LAST_NOTIFICATION_QUOTE_ID = '@last_notification_quote_id';
 
 const defaultSettings: NotificationSettings = {
   isEnabled: false,
@@ -70,6 +71,15 @@ class NotificationService {
     return quotes[randomIndex];
   }
 
+  async getLastNotificationQuoteId(): Promise<string | null> {
+    try {
+      return await AsyncStorage.getItem(LAST_NOTIFICATION_QUOTE_ID);
+    } catch (error) {
+      console.error('Error getting last notification quote ID:', error);
+      return null;
+    }
+  }
+
   async scheduleNotification(): Promise<void> {
     try {
       // Cancel existing notifications first
@@ -89,6 +99,9 @@ class NotificationService {
 
       const randomQuote = this.getRandomQuote();
       const categoryAsset = categoryAssets[randomQuote.category];
+      
+      // Lưu quoteId của thông báo gần nhất
+      await AsyncStorage.setItem(LAST_NOTIFICATION_QUOTE_ID, randomQuote.id);
 
       // Create a channel
       const channelId = await notifee.createChannel({
@@ -106,11 +119,18 @@ class NotificationService {
         repeatFrequency: RepeatFrequency.DAILY,
       };
 
+      // Chuẩn bị dữ liệu thông báo
+      const notificationData = {
+        quoteId: randomQuote.id,
+        category: randomQuote.category,
+      };
+
       // Display notification
       await notifee.createTriggerNotification(
         {
           title: `${categoryAsset.emoji} Daily ${randomQuote.category} Quote`,
           body: randomQuote.text,
+          data: notificationData,
           android: {
             channelId,
             importance: AndroidImportance.HIGH,
@@ -125,7 +145,7 @@ class NotificationService {
             },
           },
           ios: {
-            sound: this.settings.sound ? 'default' : undefined,
+            sound: this.settings.sound ? 'default' : '',
             categoryId: 'daily_quotes',
             threadId: 'daily_quotes',
             critical: true,

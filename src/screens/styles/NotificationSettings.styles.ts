@@ -87,5 +87,29 @@ export const createStyles = (isDarkMode: boolean) => {
     dateTimePicker: {
       height: 200,
     },
+    testSection: {
+      marginTop: 24,
+      alignItems: 'center',
+    },
+    testButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 8,
+      marginBottom: 10,
+      minWidth: 200,
+      alignItems: 'center',
+    },
+    testButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    testDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      paddingHorizontal: 20,
+    },
   });
 }; 
