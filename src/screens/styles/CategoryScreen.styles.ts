@@ -85,6 +85,25 @@ export const createStyles = (isDarkMode: boolean) => {
           elevation: 4,
         },
       }),
+      position: 'relative', // For absolute positioning of heart animation
+    },
+    // Heart animation styles
+    heartAnimationContainer: {
+      position: 'absolute',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      height: '100%',
+      top: 0,
+      left: 0,
+      zIndex: 10,
+    },
+    heartAnimationIcon: {
+      fontSize: 80,
+      textAlign: 'center',
+      textShadowColor: 'rgba(0, 0, 0, 0.3)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 3,
     },
     quoteText: {
       fontSize: 17,

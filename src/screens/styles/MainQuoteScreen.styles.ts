@@ -134,6 +134,20 @@ export const createStyles = (isDarkMode: boolean) => {
       fontStyle: 'italic',
       fontWeight: '500',
     },
+    // Heart animation styles
+    heartAnimationContainer: {
+      position: 'absolute',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      height: '100%',
+      zIndex: 10,
+    },
+    heartAnimationIcon: {
+      width: 80,
+      height: 80,
+      tintColor: '#FF4081',
+    },
     bottomBar: {
       flexDirection: 'row',
       justifyContent: 'center',

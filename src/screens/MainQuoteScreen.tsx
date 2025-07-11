@@ -10,6 +10,7 @@ import {
   Image,
   GestureResponderEvent,
   Alert,
+  Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { quotes, getBackgroundImage, CategoryKey, Quote } from '../data/quotes';
@@ -19,6 +20,7 @@ import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import LinearGradient from 'react-native-linear-gradient';
 import BackgroundPicker, { BackgroundOption, backgroundOptions } from '../components/BackgroundPicker';
+import { TapGestureHandler, State } from 'react-native-gesture-handler';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -36,6 +38,9 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [selectedBackgroundId, setSelectedBackgroundId] = useState('default');
   const [customBackground, setCustomBackground] = useState<any>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const doubleTapRef = useRef(null);
+  const heartScale = useRef(new Animated.Value(0)).current;
+  const [showHeartAnimation, setShowHeartAnimation] = useState(false);
 
   // Tải trước hình ảnh
   const heartActiveIcon = require('../../assets/icons/heart-active.png');
@@ -205,6 +210,36 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     }
   };
 
+  // Handle double tap to toggle favorite
+  const onDoubleTapEvent = (event: { nativeEvent: { state: number } }) => {
+    if (event.nativeEvent.state === State.ACTIVE) {
+      toggleFavorite();
+      animateHeart();
+    }
+  };
+
+  // Animate heart when double tapping
+  const animateHeart = () => {
+    setShowHeartAnimation(true);
+    Animated.sequence([
+      Animated.timing(heartScale, {
+        toValue: 1.5,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(heartScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setTimeout(() => {
+        setShowHeartAnimation(false);
+        heartScale.setValue(0);
+      }, 500);
+    });
+  };
+
   const handleNextQuote = () => {
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
   };
@@ -312,14 +347,31 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
               </View>
             )}
 
-            <View style={styles.quoteContainer}>
-              <Text style={styles.quoteText}>
-                "{safeQuote.text}"
-              </Text>
-              <Text style={styles.authorText}>
-                - {safeQuote.author}
-              </Text>
-            </View>
+            <TapGestureHandler
+              onHandlerStateChange={onDoubleTapEvent}
+              numberOfTaps={2}
+              ref={doubleTapRef}
+            >
+              <View style={styles.quoteContainer}>
+                <Text style={styles.quoteText}>
+                  "{safeQuote.text}"
+                </Text>
+                <Text style={styles.authorText}>
+                  - {safeQuote.author}
+                </Text>
+                
+                {showHeartAnimation && (
+                  <Animated.View style={[styles.heartAnimationContainer, {
+                    transform: [{ scale: heartScale }]
+                  }]}>
+                    <Image
+                      source={isFavorite ? heartInactiveIcon : heartActiveIcon}
+                      style={styles.heartAnimationIcon}
+                    />
+                  </Animated.View>
+                )}
+              </View>
+            </TapGestureHandler>
 
             <View style={styles.bottomBar}>
               <Text style={styles.categoryText}>

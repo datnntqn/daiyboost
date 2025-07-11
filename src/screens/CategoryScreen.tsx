@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,7 @@ import { CategoryType } from '../types/categories';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { categoryAssets } from '../constants/categoryAssets';
+import { TapGestureHandler, State } from 'react-native-gesture-handler';
 
 type RootStackParamList = {
   Category: { category: CategoryType };
@@ -39,6 +40,8 @@ const CategoryScreen = () => {
   const styles = createStyles(isDarkMode) as CategoryScreenStyles;
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
   const [scaleAnim] = useState(new Animated.Value(1));
+  const [heartAnimQuote, setHeartAnimQuote] = useState<string | null>(null);
+  const heartScale = useRef(new Animated.Value(0)).current;
 
   const loadFavoriteQuotes = async () => {
     try {
@@ -112,6 +115,36 @@ const CategoryScreen = () => {
     }
   };
 
+  const handleDoubleTap = (quote: Quote) => (event: { nativeEvent: { state: number } }) => {
+    if (event.nativeEvent.state === State.ACTIVE) {
+      toggleFavorite(quote);
+      animateHeartForQuote(quote.id);
+    }
+  };
+
+  const animateHeartForQuote = (quoteId: string) => {
+    setHeartAnimQuote(quoteId);
+    heartScale.setValue(0);
+    
+    Animated.sequence([
+      Animated.timing(heartScale, {
+        toValue: 1.5,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(heartScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setTimeout(() => {
+        setHeartAnimQuote(null);
+        heartScale.setValue(0);
+      }, 500);
+    });
+  };
+
   const handleShare = async (quote: Quote) => {
     try {
       await Share.share({
@@ -124,45 +157,59 @@ const CategoryScreen = () => {
 
   const renderQuoteItem = ({ item }: { item: Quote }) => {
     const isFavorite = favoriteQuotes.some(quote => quote.id === item.id);
+    const isAnimatingHeart = heartAnimQuote === item.id;
     
     return (
-      <Animated.View 
-        style={[
-          styles.quoteCard,
-        ]}
+      <TapGestureHandler
+        onHandlerStateChange={handleDoubleTap(item)}
+        numberOfTaps={2}
       >
-        <Text style={styles.quoteText}>{item.text}</Text>
-        <View style={styles.actionBar}>
-          <View style={styles.leftActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => toggleFavorite(item)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.actionIcon}>
-                {isFavorite ? '❤️' : '🤍'}
+        <Animated.View 
+          style={[
+            styles.quoteCard,
+          ]}
+        >
+          <Text style={styles.quoteText}>{item.text}</Text>
+          {isAnimatingHeart && (
+            <Animated.View style={[styles.heartAnimationContainer, {
+              transform: [{ scale: heartScale }]
+            }]}>
+              <Text style={styles.heartAnimationIcon}>
+                {isFavorite ? '🤍' : '❤️'}
               </Text>
-              <Text style={styles.actionButtonText}>
-                {isFavorite ? 'Liked' : 'Like'}
-              </Text>
-            </TouchableOpacity>
+            </Animated.View>
+          )}
+          <View style={styles.actionBar}>
+            <View style={styles.leftActions}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => toggleFavorite(item)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.actionIcon}>
+                  {isFavorite ? '❤️' : '🤍'}
+                </Text>
+                <Text style={styles.actionButtonText}>
+                  {isFavorite ? 'Liked' : 'Like'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.rightActions}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => handleShare(item)}
+                activeOpacity={0.7}
+              >
+                <Image
+                  source={require('../../assets/icons/share.png')}
+                  // @ts-ignore
+                  style={styles.actionButtonIcon}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.rightActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => handleShare(item)}
-              activeOpacity={0.7}
-            >
-              <Image
-                source={require('../../assets/icons/share.png')}
-                // @ts-ignore
-                style={styles.actionButtonIcon}
-              />
-              {/* <Text style={styles.actionButtonText}>Share</Text> */}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Animated.View>
+        </Animated.View>
+      </TapGestureHandler>
     );
   };
 
