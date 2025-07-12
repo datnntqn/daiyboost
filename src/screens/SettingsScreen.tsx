@@ -113,7 +113,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
             </>
           )}
 
-          {renderSection('Premium Features',
+          {/* {renderSection('Premium Features',
             <>
               {renderSettingItem(
                 require('../../assets/icons/star.png'),
@@ -132,8 +132,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                 true
               )}
             </>
-          , styles.premiumSection)}
-                  <View style={styles.bannerContainer}>
+          , styles.premiumSection)} */}
+        <View style={styles.bannerContainer}>
           <BannerAd
             size={BannerAdSize.BANNER}
             unitId={AdMobConfig.banner}
