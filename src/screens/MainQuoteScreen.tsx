@@ -423,11 +423,13 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
               </View>
             </TapGestureHandler>
 
-            <View style={styles.bottomBar}>
-              <Text style={styles.categoryText}>
-                MotiveMe.app
-              </Text>
-            </View>
+            {isUIVisible && (
+              <View style={styles.bottomBar}>
+                <Text style={styles.categoryText}>
+                  MotiveMe.app
+                </Text>
+              </View>
+            )}
           </SafeAreaView>
         </ImageBackground>
       </ViewShot>
