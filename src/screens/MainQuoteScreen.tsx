@@ -20,7 +20,6 @@ import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import LinearGradient from 'react-native-linear-gradient';
 import BackgroundPicker, { BackgroundOption, backgroundOptions } from '../components/BackgroundPicker';
-import { TapGestureHandler, State } from 'react-native-gesture-handler';
 import AdMobService from '../services/AdMobService';
 import { useVisibility } from '../context/VisibilityContext';
 
@@ -42,12 +41,14 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [selectedBackgroundId, setSelectedBackgroundId] = useState('default');
   const [customBackground, setCustomBackground] = useState<any>(null);
   const [isCapturing, setIsCapturing] = useState(false);
-  const doubleTapRef = useRef(null);
   const heartScale = useRef(new Animated.Value(0)).current;
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [swipeCount, setSwipeCount] = useState(0);
   const [lastAdShow, setLastAdShow] = useState(0);
   const [isQuoteAreaTouched, setIsQuoteAreaTouched] = useState(false);
+  
+  // Last tap time for detecting double taps manually
+  const lastTapTimeRef = useRef(0);
   
   // Animation values for quote transitions
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -223,14 +224,6 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     }
   };
 
-  // Handle double tap to toggle favorite
-  const onDoubleTapEvent = (event: { nativeEvent: { state: number } }) => {
-    if (event.nativeEvent.state === State.ACTIVE) {
-      toggleFavorite();
-      animateHeart();
-    }
-  };
-
   // Animate heart when double tapping
   const animateHeart = () => {
     setShowHeartAnimation(true);
@@ -310,6 +303,36 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     });
   };
 
+  // Handle touch on quote area
+  const handleQuoteTap = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300; // milliseconds
+    
+    if (now - lastTapTimeRef.current < DOUBLE_TAP_DELAY) {
+      // This is a double tap
+      console.log('Double tap detected');
+      toggleFavorite();
+      animateHeart();
+      // Reset tap time
+      lastTapTimeRef.current = 0;
+    } else {
+      // This is a single tap - set the time and wait to see if there's a second tap
+      lastTapTimeRef.current = now;
+      
+      // If no second tap within the delay, treat as single tap
+      setTimeout(() => {
+        const elapsed = Date.now() - lastTapTimeRef.current;
+        if (lastTapTimeRef.current !== 0 && elapsed >= DOUBLE_TAP_DELAY) {
+          // This was a single tap
+          console.log('Single tap detected');
+          toggleUIVisibility();
+          // Reset tap time
+          lastTapTimeRef.current = 0;
+        }
+      }, DOUBLE_TAP_DELAY);
+    }
+  };
+
   const handleTouchStart = (event: GestureResponderEvent) => {
     setStartY(event.nativeEvent.pageY);
   };
@@ -322,8 +345,8 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
       // This is a swipe up, handle next quote
       handleNextQuote();
     } else if (Math.abs(deltaY) < 10 && isQuoteAreaTouched) {
-      // This is a tap on the quote area, toggle UI visibility
-      toggleUIVisibility();
+      // This is a tap on the quote area, handle tap
+      handleQuoteTap();
     }
     
     // Reset the quote area touch flag
@@ -428,41 +451,35 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
               </View>
             )}
 
-            <TapGestureHandler
-              onHandlerStateChange={onDoubleTapEvent}
-              numberOfTaps={2}
-              ref={doubleTapRef}
+            <View 
+              style={styles.quoteContainer}
+              onTouchStart={handleQuoteAreaTouchStart}
             >
-              <View 
-                style={styles.quoteContainer}
-                onTouchStart={handleQuoteAreaTouchStart}
+              <Animated.View
+                style={{
+                  opacity: fadeAnim,
+                  transform: [{ translateY: slideAnim }]
+                }}
               >
-                <Animated.View
-                  style={{
-                    opacity: fadeAnim,
-                    transform: [{ translateY: slideAnim }]
-                  }}
-                >
-                  <Text style={styles.quoteText}>
-                    "{safeQuote.text}"
-                  </Text>
-                  <Text style={styles.authorText}>
-                    - {safeQuote.author}
-                  </Text>
+                <Text style={styles.quoteText}>
+                  "{safeQuote.text}"
+                </Text>
+                <Text style={styles.authorText}>
+                  - {safeQuote.author}
+                </Text>
+              </Animated.View>
+              
+              {showHeartAnimation && (
+                <Animated.View style={[styles.heartAnimationContainer, {
+                  transform: [{ scale: heartScale }]
+                }]}>
+                  <Image
+                    source={isFavorite ? heartInactiveIcon : heartActiveIcon}
+                    style={[styles.heartAnimationIcon, isFavorite ? { tintColor: '#FF0000' } : { tintColor: '#FFFFFF' }]}
+                  />
                 </Animated.View>
-                
-                {showHeartAnimation && (
-                  <Animated.View style={[styles.heartAnimationContainer, {
-                    transform: [{ scale: heartScale }]
-                  }]}>
-                    <Image
-                      source={isFavorite ? heartInactiveIcon : heartActiveIcon}
-                      style={[styles.heartAnimationIcon, isFavorite ? { tintColor: '#FF0000' } : { tintColor: '#FFFFFF' }]}
-                    />
-                  </Animated.View>
-                )}
-              </View>
-            </TapGestureHandler>
+              )}
+            </View>
 
             {isUIVisible && (
               <View style={styles.bottomBar}>
