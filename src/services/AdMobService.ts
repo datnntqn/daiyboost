@@ -18,8 +18,11 @@ class AdMobService {
     try {
       if (!this.initialized) {
         await MobileAds().initialize();
+        MobileAds().setRequestConfiguration({
+          testDeviceIdentifiers: __DEV__ ? ['EMULATOR'] : []
+        });
         this.initialized = true;
-        console.log('AdMob initialized successfully');
+        console.log('AdMob initialized successfully with appId:', AdMobConfig.appId);
       }
     } catch (error) {
       console.error('Failed to initialize AdMob:', error);
