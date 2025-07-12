@@ -9,6 +9,7 @@ import { lightColors, darkColors } from '../theme/colors';
 const NotificationSettingsScreen = () => {
   const { isDarkMode } = useTheme();
   const styles = createStyles(isDarkMode);
+  const colors = isDarkMode ? darkColors : lightColors;
   const [settings, setSettings] = useState<NotificationSettings>({
     isEnabled: false,
     preferredTime: '09:00',
@@ -89,6 +90,7 @@ const NotificationSettingsScreen = () => {
                 display="spinner"
                 onChange={handleTimeChange}
                 style={styles.dateTimePicker}
+                textColor={colors.text}
               />
             </View>
           </View>
@@ -111,6 +113,7 @@ const NotificationSettingsScreen = () => {
             handleSettingChange('preferredTime', `${hours}:${minutes}`);
           }
         }}
+        textColor={colors.text}
       />
     );
   };
