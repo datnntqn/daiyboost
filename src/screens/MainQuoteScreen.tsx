@@ -49,6 +49,10 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [lastAdShow, setLastAdShow] = useState(0);
   const [isQuoteAreaTouched, setIsQuoteAreaTouched] = useState(false);
   
+  // Animation values for quote transitions
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  
   const { isUIVisible, toggleUIVisibility } = useVisibility();
 
   // Tải trước hình ảnh
@@ -250,30 +254,60 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   };
 
   const handleNextQuote = async () => {
-    // Increment swipe count
-    const newCount = swipeCount + 1;
-    setSwipeCount(newCount);
-
-    // Show ad after 5-10 swipes (random)
-    const minSwipes = 5;
-    const currentTime = Date.now();
-    const timeSinceLastAd = currentTime - lastAdShow;
-    const minTimeBetweenAds = 60000; // 1 minute
-
-    if (newCount >= minSwipes && 
-        timeSinceLastAd >= minTimeBetweenAds && 
-        Math.random() < 0.2) { // 20% chance to show ad after minimum swipes
-      const adMobService = AdMobService.getInstance();
-      const shown = await adMobService.showInterstitialAd();
-      
-      if (shown) {
-        setSwipeCount(0); // Reset counter after showing ad
-        setLastAdShow(currentTime);
+    // Start fade out animation
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -50,
+        duration: 200,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
+      // Increment swipe count
+      const newCount = swipeCount + 1;
+      setSwipeCount(newCount);
+  
+      // Show ad after 5-10 swipes (random)
+      const minSwipes = 5;
+      const currentTime = Date.now();
+      const timeSinceLastAd = currentTime - lastAdShow;
+      const minTimeBetweenAds = 60000; // 1 minute
+  
+      if (newCount >= minSwipes && 
+          timeSinceLastAd >= minTimeBetweenAds && 
+          Math.random() < 0.2) { // 20% chance to show ad after minimum swipes
+        const adMobService = AdMobService.getInstance();
+        adMobService.showInterstitialAd().then(shown => {
+          if (shown) {
+            setSwipeCount(0); // Reset counter after showing ad
+            setLastAdShow(currentTime);
+          }
+        });
       }
-    }
-
-    // Change to next quote without affecting UI visibility state
-    setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
+  
+      // Change to next quote without affecting UI visibility state
+      setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
+      
+      // Reset animation values and start fade in animation
+      slideAnim.setValue(50);
+      
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        })
+      ]).start();
+    });
   };
 
   const handleTouchStart = (event: GestureResponderEvent) => {
@@ -403,12 +437,19 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
                 style={styles.quoteContainer}
                 onTouchStart={handleQuoteAreaTouchStart}
               >
-                <Text style={styles.quoteText}>
-                  "{safeQuote.text}"
-                </Text>
-                <Text style={styles.authorText}>
-                  - {safeQuote.author}
-                </Text>
+                <Animated.View
+                  style={{
+                    opacity: fadeAnim,
+                    transform: [{ translateY: slideAnim }]
+                  }}
+                >
+                  <Text style={styles.quoteText}>
+                    "{safeQuote.text}"
+                  </Text>
+                  <Text style={styles.authorText}>
+                    - {safeQuote.author}
+                  </Text>
+                </Animated.View>
                 
                 {showHeartAnimation && (
                   <Animated.View style={[styles.heartAnimationContainer, {
