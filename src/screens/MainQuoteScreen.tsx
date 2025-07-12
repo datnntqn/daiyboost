@@ -366,7 +366,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
                   }]}>
                     <Image
                       source={isFavorite ? heartInactiveIcon : heartActiveIcon}
-                      style={styles.heartAnimationIcon}
+                      style={[styles.heartAnimationIcon, isFavorite ? { tintColor: '#FF0000' } : { tintColor: '#FFFFFF' }]}
                     />
                   </Animated.View>
                 )}

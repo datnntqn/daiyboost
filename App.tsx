@@ -17,6 +17,7 @@ import { lightColors, darkColors } from './src/theme/colors';
 import { RootStackParamList } from './src/types/navigation';
 import notifee, { EventType } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -176,11 +177,13 @@ const App = () => {
   }, []);
 
   return (
-    <ThemeProvider>
-      <NavigationContainer>
-        <NavigationWrapper />
-      </NavigationContainer>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <NavigationContainer>
+          <NavigationWrapper />
+        </NavigationContainer>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 };
 

@@ -174,8 +174,10 @@ const CategoryScreen = () => {
             <Animated.View style={[styles.heartAnimationContainer, {
               transform: [{ scale: heartScale }]
             }]}>
-              <Text style={styles.heartAnimationIcon}>
-                {isFavorite ? '🤍' : '❤️'}
+              <Text style={[styles.heartAnimationIcon, {
+                color: isFavorite ? '#FF0000' : '#FFFFFF'
+              }]}>
+                {isFavorite ? '❤️' : '🤍'}
               </Text>
             </Animated.View>
           )}
