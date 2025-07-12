@@ -8,11 +8,15 @@ import { useFocusEffect } from '@react-navigation/native';
 import { createStyles } from './styles/FavoriteQuotesScreen.styles';
 import { Swipeable, RectButton, GestureHandlerRootView } from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import AdMobConfig from '../constants/adMobConfig';
 
 type RenderItemProps = {
   item: Quote;
   index: number;
 };
+
+const BANNER_HEIGHT = 50;
 
 const FavoriteQuotesScreen = () => {
   const [favoriteQuotes, setFavoriteQuotes] = useState<Quote[]>([]);
@@ -139,6 +143,22 @@ const FavoriteQuotesScreen = () => {
             barStyle={isDarkMode ? 'light-content' : 'dark-content'}
             backgroundColor={isDarkMode ? '#1a1a1a' : '#ffffff'}
           />
+          <View style={{
+            width: '100%',
+            height: BANNER_HEIGHT,
+            backgroundColor: 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 8,
+          }}>
+            <BannerAd
+              size={BannerAdSize.BANNER}
+              unitId={__DEV__ ? TestIds.BANNER : AdMobConfig.banner}
+              requestOptions={{
+                requestNonPersonalizedAdsOnly: true,
+              }}
+            />
+          </View>
           <View style={styles.contentContainer}>
             {favoriteQuotes.length > 0 ? (
               <FlatList

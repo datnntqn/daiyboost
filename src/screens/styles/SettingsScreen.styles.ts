@@ -168,6 +168,12 @@ export const createStyles = (isDarkMode: boolean) =>
       fontSize: 15,
       fontWeight: '500',
     },
+    bannerContainer: {
+      width: '100%',
+      alignItems: 'center',
+      paddingVertical: 10,
+      backgroundColor: isDarkMode ? colors.darkBackground : colors.lightBackground,
+    },
   });
 
 

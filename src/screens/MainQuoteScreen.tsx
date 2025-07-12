@@ -27,6 +27,8 @@ LogBox.ignoreLogs(['Require cycle:']);
 
 type MainQuoteScreenProps = {};
 
+console.log('Initializing MainQuoteScreen component');
+
 const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const { isDarkMode } = useTheme();
   const styles = createStyles(isDarkMode);

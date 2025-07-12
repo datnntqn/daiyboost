@@ -18,6 +18,7 @@ import { RootStackParamList } from './src/types/navigation';
 import notifee, { EventType } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AdMobService from './src/services/AdMobService';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -138,7 +139,14 @@ const NavigationWrapper = () => {
 
 const App = () => {
   useEffect(() => {
-    // Xử lý khi người dùng nhấp vào thông báo
+    // Initialize AdMob
+    const initAds = async () => {
+      const adMobService = AdMobService.getInstance();
+      await adMobService.initialize();
+    };
+    initAds();
+
+    // Handle notifications
     const setupNotificationHandler = async () => {
       // Đăng ký foreground handler
       const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {

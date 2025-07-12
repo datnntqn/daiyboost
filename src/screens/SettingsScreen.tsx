@@ -12,6 +12,8 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { createStyles } from './styles/SettingsScreen.styles';
 import { colors } from '../theme/colors';
+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import AdMobConfig from '../constants/adMobConfig';
 
 type SettingsScreenProps = {
   navigation: any;
@@ -131,10 +133,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
               )}
             </>
           , styles.premiumSection)}
-
-          <View style={styles.adSpace}>
-            <Text style={styles.adText}>Advertisement</Text>
-          </View>
+                  <View style={styles.bannerContainer}>
+          <BannerAd
+            size={BannerAdSize.BANNER}
+            unitId={AdMobConfig.banner}
+            requestOptions={{
+              requestNonPersonalizedAdsOnly: true,
+              keywords: ['motivation', 'quotes', 'inspiration']
+            }}
+          />
+        </View>
         </ScrollView>
       </View>
     </SafeAreaView>

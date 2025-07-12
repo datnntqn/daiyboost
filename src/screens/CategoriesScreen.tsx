@@ -13,7 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import { createStyles } from './styles/CategoriesScreen.styles';
 import { categoryAssets } from '../constants/categoryAssets';
-import { CategoryType } from '../types/Quote';
+import { CategoryType } from '../types/categories';
 import LinearGradient from 'react-native-linear-gradient';
 
 type RootStackParamList = {

@@ -23,6 +23,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { categoryAssets } from '../constants/categoryAssets';
 import { TapGestureHandler, State } from 'react-native-gesture-handler';
+import { BannerAd, BannerAdSize, TestIds, InterstitialAd } from 'react-native-google-mobile-ads';
+import AdMobConfig from '../constants/adMobConfig';
+
+const BANNER_HEIGHT = 50;
+const interstitialAd = InterstitialAd.createForAdRequest(
+  __DEV__ ? TestIds.INTERSTITIAL : AdMobConfig.interstitial
+);
 
 type RootStackParamList = {
   Category: { category: CategoryType };
@@ -42,6 +49,7 @@ const CategoryScreen = () => {
   const [scaleAnim] = useState(new Animated.Value(1));
   const [heartAnimQuote, setHeartAnimQuote] = useState<string | null>(null);
   const heartScale = useRef(new Animated.Value(0)).current;
+  const [quoteViewCount, setQuoteViewCount] = useState(0);
 
   const loadFavoriteQuotes = async () => {
     try {
@@ -56,7 +64,41 @@ const CategoryScreen = () => {
 
   useEffect(() => {
     loadFavoriteQuotes();
+    // Load interstitial ad
+    const loadInterstitial = () => {
+      interstitialAd.load();
+    };
+    loadInterstitial();
+
+    return () => {
+      // Cleanup
+    };
   }, []);
+
+  const showInterstitialAd = async () => {
+    try {
+      const isLoaded = await interstitialAd.loaded;
+      if (isLoaded) {
+        await interstitialAd.show();
+        // Reset counter after showing ad
+        setQuoteViewCount(0);
+        // Load next ad
+        interstitialAd.load();
+      }
+    } catch (error) {
+      console.error('Error showing interstitial ad:', error);
+    }
+  };
+
+  const handleQuoteView = () => {
+    const newCount = quoteViewCount + 1;
+    setQuoteViewCount(newCount);
+    
+    // Show interstitial ad every 5 quote views
+    if (newCount >= 5) {
+      showInterstitialAd();
+    }
+  };
 
   // Add safety check for route.params
   if (!route.params?.category) {
@@ -117,6 +159,7 @@ const CategoryScreen = () => {
 
   const handleDoubleTap = (quote: Quote) => (event: { nativeEvent: { state: number } }) => {
     if (event.nativeEvent.state === State.ACTIVE) {
+      handleQuoteView();
       toggleFavorite(quote);
       animateHeartForQuote(quote.id);
     }
@@ -250,6 +293,23 @@ const CategoryScreen = () => {
             <Text style={styles.headerSubtitle}>
               Motive Me - Find your inspiration
             </Text>
+          </View>
+
+          <View style={{
+            width: '100%',
+            height: BANNER_HEIGHT,
+            backgroundColor: 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginVertical: 8,
+          }}>
+            <BannerAd
+              size={BannerAdSize.BANNER}
+              unitId={__DEV__ ? TestIds.BANNER : AdMobConfig.banner}
+              requestOptions={{
+                requestNonPersonalizedAdsOnly: true,
+              }}
+            />
           </View>
 
           <FlatList
