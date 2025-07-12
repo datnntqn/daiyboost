@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Platform, Text } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from '@react-native-community/blur';
 import { useTheme } from '../context/ThemeContext';
+import { useVisibility } from '../context/VisibilityContext';
 import { createTabBarStyles } from '../screens/styles/TabBar.styles';
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ 
@@ -11,7 +12,13 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   navigation 
 }) => {
   const { isDarkMode } = useTheme();
+  const { isUIVisible } = useVisibility();
   const styles = createTabBarStyles(isDarkMode);
+
+  // If UI is not visible, don't render the tab bar
+  if (!isUIVisible) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

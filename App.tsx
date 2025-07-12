@@ -11,6 +11,7 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import NotificationSettingsScreen from './src/screens/NotificationSettingsScreen';
 import FavoriteQuotesScreen from './src/screens/FavoriteQuotesScreen';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { VisibilityProvider } from './src/context/VisibilityContext';
 import { useTheme } from './src/context/ThemeContext';
 import CustomTabBar from './src/components/CustomTabBar';
 import { lightColors, darkColors } from './src/theme/colors';
@@ -187,9 +188,11 @@ const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
-        <NavigationContainer>
-          <NavigationWrapper />
-        </NavigationContainer>
+        <VisibilityProvider>
+          <NavigationContainer>
+            <NavigationWrapper />
+          </NavigationContainer>
+        </VisibilityProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

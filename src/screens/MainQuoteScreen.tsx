@@ -8,9 +8,9 @@ import {
   LogBox, 
   ImageBackground,
   Image,
-  GestureResponderEvent,
   Alert,
   Animated,
+  GestureResponderEvent,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { quotes, getBackgroundImage, CategoryKey, Quote } from '../data/quotes';
@@ -22,6 +22,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import BackgroundPicker, { BackgroundOption, backgroundOptions } from '../components/BackgroundPicker';
 import { TapGestureHandler, State } from 'react-native-gesture-handler';
 import AdMobService from '../services/AdMobService';
+import { useVisibility } from '../context/VisibilityContext';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -46,6 +47,9 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [swipeCount, setSwipeCount] = useState(0);
   const [lastAdShow, setLastAdShow] = useState(0);
+  const [isQuoteAreaTouched, setIsQuoteAreaTouched] = useState(false);
+  
+  const { isUIVisible, toggleUIVisibility } = useVisibility();
 
   // Tải trước hình ảnh
   const heartActiveIcon = require('../../assets/icons/heart-active.png');
@@ -268,6 +272,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
       }
     }
 
+    // Change to next quote without affecting UI visibility state
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
   };
 
@@ -278,7 +283,22 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const handleTouchEnd = (event: GestureResponderEvent) => {
     const endY = event.nativeEvent.pageY;
     const deltaY = startY - endY;
-    if (deltaY > 50) handleNextQuote();
+    
+    if (deltaY > 50) {
+      // This is a swipe up, handle next quote
+      handleNextQuote();
+    } else if (Math.abs(deltaY) < 10 && isQuoteAreaTouched) {
+      // This is a tap on the quote area, toggle UI visibility
+      toggleUIVisibility();
+    }
+    
+    // Reset the quote area touch flag
+    setIsQuoteAreaTouched(false);
+  };
+  
+  // Track if the touch started in the quote area
+  const handleQuoteAreaTouchStart = () => {
+    setIsQuoteAreaTouched(true);
   };
 
   const handleShare = async () => {
@@ -342,7 +362,7 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
           />
           
           <SafeAreaView style={styles.safeAreaContainer}>
-            {!isCapturing && (
+            {!isCapturing && isUIVisible && (
               <View style={styles.topBar}>
                 <View style={styles.leftActions}>
                   <BackgroundPicker
@@ -379,7 +399,10 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
               numberOfTaps={2}
               ref={doubleTapRef}
             >
-              <View style={styles.quoteContainer}>
+              <View 
+                style={styles.quoteContainer}
+                onTouchStart={handleQuoteAreaTouchStart}
+              >
                 <Text style={styles.quoteText}>
                   "{safeQuote.text}"
                 </Text>
