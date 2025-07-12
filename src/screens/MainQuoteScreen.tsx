@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  TouchableOpacity,
   SafeAreaView, 
   StatusBar, 
   LogBox, 
@@ -21,6 +21,7 @@ import Share from 'react-native-share';
 import LinearGradient from 'react-native-linear-gradient';
 import BackgroundPicker, { BackgroundOption, backgroundOptions } from '../components/BackgroundPicker';
 import { TapGestureHandler, State } from 'react-native-gesture-handler';
+import AdMobService from '../services/AdMobService';
 
 // Bỏ qua cảnh báo
 LogBox.ignoreLogs(['Require cycle:']);
@@ -43,6 +44,8 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
   const doubleTapRef = useRef(null);
   const heartScale = useRef(new Animated.Value(0)).current;
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
+  const [swipeCount, setSwipeCount] = useState(0);
+  const [lastAdShow, setLastAdShow] = useState(0);
 
   // Tải trước hình ảnh
   const heartActiveIcon = require('../../assets/icons/heart-active.png');
@@ -242,7 +245,29 @@ const MainQuoteScreen: React.FC<MainQuoteScreenProps> = () => {
     });
   };
 
-  const handleNextQuote = () => {
+  const handleNextQuote = async () => {
+    // Increment swipe count
+    const newCount = swipeCount + 1;
+    setSwipeCount(newCount);
+
+    // Show ad after 5-10 swipes (random)
+    const minSwipes = 5;
+    const currentTime = Date.now();
+    const timeSinceLastAd = currentTime - lastAdShow;
+    const minTimeBetweenAds = 60000; // 1 minute
+
+    if (newCount >= minSwipes && 
+        timeSinceLastAd >= minTimeBetweenAds && 
+        Math.random() < 0.2) { // 20% chance to show ad after minimum swipes
+      const adMobService = AdMobService.getInstance();
+      const shown = await adMobService.showInterstitialAd();
+      
+      if (shown) {
+        setSwipeCount(0); // Reset counter after showing ad
+        setLastAdShow(currentTime);
+      }
+    }
+
     setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
   };
 
