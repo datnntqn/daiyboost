@@ -23,22 +23,25 @@ interface CategoryCardProps {
 }
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 64) / 2; // 2 columns with more padding
+// Tính toán chiều rộng card dựa trên chiều rộng màn hình và padding
+const HORIZONTAL_PADDING = 16 * 2; // Tổng padding ngang của container
+const CARD_GAP = 16; // Khoảng cách giữa 2 card
+const CARD_WIDTH = (width - HORIZONTAL_PADDING - CARD_GAP) / 2; // 2 columns
 
 const getBackgroundImage = (categoryName: string) => {
   switch (categoryName) {
     case 'Happiness':
-      return require('../../assets/backgrounds/happiness.jpg');
+      return require('../../assets/backgrounds_new/calm.jpg');
     case 'Productivity':
       return require('../../assets/backgrounds_new/productivity_tips.jpg');
     case 'Self-Love':
-      return require('../../assets/backgrounds/self_love.jpg');
+      return require('../../assets/backgrounds_new/forest.jpg');
     case 'Inspiration':
-      return require('../../assets/backgrounds/inspiration.jpg');
+      return require('../../assets/backgrounds_new/wave.jpg');
     case 'Success':
       return require('../../assets/backgrounds/success.jpg');
     case 'Mindfulness':
-      return require('../../assets/backgrounds/mindfulness.jpg');
+      return require('../../assets/backgrounds_new/rain.jpg');
     default:
       return require('../../assets/backgrounds/Wave.jpg');
   }
@@ -115,7 +118,8 @@ const styles = StyleSheet.create({
   cardContainer: {
     width: CARD_WIDTH,
     height: CARD_WIDTH * 1.3,
-    margin: 8,
+    marginBottom: 0, // Không cần margin dưới vì đã có marginBottom trong columnWrapper
+    marginHorizontal: 0, // Không cần margin ngang vì đã tính trong CARD_WIDTH
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',

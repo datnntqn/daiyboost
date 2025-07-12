@@ -4,16 +4,15 @@ import {
   Text,
   SafeAreaView,
   StatusBar,
-  ImageBackground,
   StyleSheet,
   Platform,
+  ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTheme } from '../context/ThemeContext';
 import { categoryAssets } from '../constants/categoryAssets';
 import { CategoryType } from '../types/categories';
-import LinearGradient from 'react-native-linear-gradient';
 import CategoryGrid from '../components/CategoryGrid';
 import { BlurView } from '@react-native-community/blur';
 
@@ -47,61 +46,38 @@ const CategoriesScreen = () => {
     navigation.navigate('Category', { category: categoryId as CategoryType });
   };
 
-  const renderHeader = () => {
-    if (Platform.OS === 'ios') {
-      return (
-        <BlurView
-          style={styles.headerBlur}
-          blurType={isDarkMode ? 'dark' : 'light'}
-          blurAmount={10}
-          reducedTransparencyFallbackColor={isDarkMode ? 'rgba(26, 26, 26, 0.85)' : 'rgba(255, 255, 255, 0.85)'}
-        >
-          <Text style={[styles.headerTitle, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>
-            Categories
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: isDarkMode ? '#CCCCCC' : '#666666' }]}>
-            Choose your daily boost
-          </Text>
-        </BlurView>
-      );
-    } else {
-      return (
-        <View style={[styles.headerBlur, { 
-          backgroundColor: isDarkMode ? 'rgba(26, 26, 26, 0.85)' : 'rgba(255, 255, 255, 0.85)'
-        }]}>
-          <Text style={[styles.headerTitle, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>
-            Categories
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: isDarkMode ? '#CCCCCC' : '#666666' }]}>
-            Choose your daily boost
-          </Text>
-        </View>
-      );
-    }
-  };
+  // Chọn background phù hợp cho màn hình
+  const backgroundImage = isDarkMode 
+    ? require('../../assets/backgrounds_new/minimal.jpg') 
+    : require('../../assets/backgrounds_new/calm.jpg');
 
   return (
-    <View style={styles.container}>
+    <ImageBackground 
+      source={backgroundImage}
+      style={styles.container}
+      resizeMode="cover"
+    >
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor="transparent"
         translucent
       />
-      <ImageBackground
-        source={require('../../assets/backgrounds/Wave.jpg')}
-        style={styles.backgroundImage}
-        resizeMode="cover"
+      
+      {/* Overlay mờ cho toàn màn hình */}
+      <BlurView
+        style={styles.blurContainer}
+        blurType={isDarkMode ? 'dark' : 'light'}
+        blurAmount={25}
+        reducedTransparencyFallbackColor={isDarkMode ? 'rgba(20, 20, 20, 0.8)' : 'rgba(255, 255, 255, 0.8)'}
       >
-        <LinearGradient
-          colors={isDarkMode 
-            ? ['rgba(26, 26, 26, 0.3)', 'rgba(26, 26, 26, 0.6)']
-            : ['rgba(255, 255, 255, 0.3)', 'rgba(255, 255, 255, 0.6)']}
-          style={styles.gradientOverlay}
-          pointerEvents="none"
-        />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.header}>
-            {renderHeader()}
+            <Text style={[
+              styles.headerTitle,
+              { color: isDarkMode ? '#FFFFFF' : '#000000' }
+            ]}>
+              Categories
+            </Text>
           </View>
 
           <View style={styles.gridContainer}>
@@ -111,54 +87,39 @@ const CategoriesScreen = () => {
             />
           </View>
         </SafeAreaView>
-      </ImageBackground>
-    </View>
+      </BlurView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  backgroundImage: {
-    flex: 1,
     width: '100%',
+    height: '100%',
+  },
+  blurContainer: {
+    flex: 1,
+    backgroundColor: 'transparent',
   },
   safeArea: {
     flex: 1,
-    zIndex: 2,
-  },
-  gradientOverlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    zIndex: 1,
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 50 : 40,
-    paddingBottom: 12,
-    zIndex: 3,
-  },
-  headerBlur: {
-    borderRadius: 16,
-    padding: 16,
-    overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    paddingTop: Platform.OS === 'ios' ? 12 : 16,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    opacity: 0.8,
+    fontSize: 34,
+    fontWeight: Platform.OS === 'ios' ? '700' : 'bold',
+    fontFamily: Platform.OS === 'ios' ? 'System' : undefined,
   },
   gridContainer: {
     flex: 1,
-    paddingTop: 4,
+    paddingHorizontal: 0,
   },
 });
 

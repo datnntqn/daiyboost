@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, Dimensions } from 'react-native';
 import CategoryCard from './CategoryCard';
 
 interface CategoryItem {
@@ -14,12 +14,17 @@ interface CategoryGridProps {
   onPressCategory: (id: string) => void;
 }
 
+const { width } = Dimensions.get('window');
+const ITEM_SPACING = 12;
+const ITEM_WIDTH = (width - 48 - ITEM_SPACING) / 2; // Tương tự như BackgroundPicker
+
 const CategoryGrid: React.FC<CategoryGridProps> = ({ data, onPressCategory }) => {
   const renderItem = ({ item, index }: { item: CategoryItem; index: number }) => (
     <CategoryCard
       item={item}
       onPress={onPressCategory}
       index={index}
+      width={ITEM_WIDTH}
     />
   );
 
@@ -38,12 +43,13 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ data, onPressCategory }) =>
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 100, // Thêm padding bottom để tránh bị che bởi bottom tab
   },
   columnWrapper: {
     justifyContent: 'space-between',
-    marginHorizontal: 4,
+    marginBottom: ITEM_SPACING,
   },
 });
 
